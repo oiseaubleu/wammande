@@ -23,7 +23,7 @@ https://docs.google.com/spreadsheets/d/154CVvoQ8N4vRXM4_5HUhH2yM2aA-obYbY6_EeVml
 
 ## テーブル定義書
 
-https://docs.google.com/spreadsheets/d/154CVvoQ8N4vRXM4_5HUhH2yM2aA-obYbY6_EeVml3TQ/edit?gid=2099740619#gid=2099740619
+https://docs.google.com/spreadsheets/d/154CVvoQ8N4vRXM4_5HUhH2yM2aA-obYbY6_EeVml3TQ/edit?gid=2093059056#gid=2093059056
 
 ## ワイヤーフレーム
 
@@ -35,7 +35,7 @@ https://docs.google.com/spreadsheets/d/154CVvoQ8N4vRXM4_5HUhH2yM2aA-obYbY6_EeVml
 
 ## ER 図
 
-<img width="670" alt="ER" src="https://github.com/user-attachments/assets/f78782fe-a519-4189-a21d-f73952c3d33b">
+<img width="572" alt="ER" src="https://github.com/user-attachments/assets/795f9eb5-c176-4682-a736-382209c78ddc">
 
 ## 画面遷移図
 
