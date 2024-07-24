@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  cycle_value: 1
+  cycle_unit: 1
+  how_to_order: 1
+
+two:
+  name: MyString
+  cycle_value: 1
+  cycle_unit: 1
+  how_to_order: 1

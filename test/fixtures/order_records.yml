@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  supplier: one
+  order_status: 1
+  order_date: 2024-07-22 16:01:53
+  delivery_date: 2024-07-22 16:01:53
+  total_amount: 9.99
+  user: one
+
+two:
+  supplier: two
+  order_status: 1
+  order_date: 2024-07-22 16:01:53
+  delivery_date: 2024-07-22 16:01:53
+  total_amount: 9.99
+  user: two

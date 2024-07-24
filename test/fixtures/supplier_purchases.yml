@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  supplier: one
+  purchase: one
+  price: 9.99
+  version: 
+  purchase_count: 
+  comment: MyText
+  next_purchase_day: 2024-07-22 16:01:46
+
+two:
+  supplier: two
+  purchase: two
+  price: 9.99
+  version: 
+  purchase_count: 
+  comment: MyText
+  next_purchase_day: 2024-07-22 16:01:46
