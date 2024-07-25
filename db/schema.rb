@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_22_070208) do
+ActiveRecord::Schema.define(version: 2024_07_24_235422) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 2024_07_22_070208) do
     t.integer "year", null: false
     t.integer "month", null: false
     t.decimal "purchase_budget", null: false
-    t.decimal "countdown_amount", null: false
+    t.decimal "alert_threshold", null: false
     t.text "comment"
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
