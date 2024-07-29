@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_24_235422) do
+ActiveRecord::Schema.define(version: 2024_07_25_052911) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,7 +68,6 @@ ActiveRecord::Schema.define(version: 2024_07_24_235422) do
     t.bigint "version", null: false
     t.bigint "purchase_count", default: 0, null: false
     t.text "comment"
-    t.datetime "next_purchase_day", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["purchase_id"], name: "index_supplier_purchases_on_purchase_id"
@@ -82,6 +81,7 @@ ActiveRecord::Schema.define(version: 2024_07_24_235422) do
     t.integer "how_to_order", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "next_purchase_day", default: -> { "CURRENT_TIMESTAMP" }, null: false
   end
 
   create_table "users", force: :cascade do |t|

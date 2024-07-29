@@ -5,7 +5,7 @@ class Budget < ApplicationRecord
    validates :year, presence: true
    validates :month, presence: true
    validates :purchase_budget, presence: true, numericality: true
-   validates :countdown_amount, presence: true, numericality: true
+   validates :alert_threshold, presence: true, numericality: true
   
 
 end

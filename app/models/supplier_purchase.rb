@@ -7,5 +7,5 @@ class SupplierPurchase < ApplicationRecord
   validates :price, presence: true, numericality: true
   validates :version, presence: true
   validates :purchase_count, presence: true
-  validates :next_purchase_day, presence: true
+ 
 end

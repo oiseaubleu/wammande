@@ -8,9 +8,10 @@ class Supplier < ApplicationRecord
   validates :cycle_value, presence: true
   validates :cycle_unit, presence: true
   validates :how_to_order, presence: true
+  validates :next_purchase_day, presence: true
 
   #enum
   enum cycle_unit: %i[daily weekly monthly yearly]
-  enum how_to_order: %i[phone email online direct]
+  enum how_to_order: %i[application direct online email ]
 
 end
