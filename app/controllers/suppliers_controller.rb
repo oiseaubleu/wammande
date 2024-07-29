@@ -14,12 +14,14 @@ class SuppliersController < ApplicationController
 
   # 仕入先の新規登録##########
   def create
-    #@supplier = Supplier.new(supplier_params)
-    
-  @supplier_purchases = Supplier_purchases.new(supplier_purchases_params) #Supplier.find(14).supplier_purchases
-    #binding.irb
-    
-
+    binding.irb
+    @supplier = Supplier.new(supplier_params.extract!(:name, :cycle_value, :cycle_unit,  :how_to_order,:next_purchase_day))
+    #@supplier_purchases = Supplier_purchases.new(supplier_purchases_params) #Supplier.find(14).supplier_purchases
+   
+    for supplier_purchase in  supplier_params[:supplier_purchases] do
+      @supplier.supplier_purchases.new(
+        supplier_purchase.merge({ version: 2, purchase_count: 3 })) ## 後でversion:2, purchase_count:3を変える
+    end
 
     if @supplier.save
       render json: @supplier, status: :created #201
@@ -54,12 +56,18 @@ class SuppliersController < ApplicationController
   end
 
   def supplier_params
-    params.require(:supplier).permit(:name, :cycle_value, :cycle_unit, :how_to_order,:next_purchase_day)
+    # params.require(:supplier).permit(:name, :cycle_value, :cycle_unit, :how_to_order,:next_purchase_day)
+    params.require(:supplier).permit(
+      :name, :cycle_value, :cycle_unit, :how_to_order,:next_purchase_day,
+     supplier_purchases:[ :purchase_id, :item_number, :price, :comment] 
+    )
   end
 
-  def supplier_purchases_params
-    params.require(:supplier_purchase).permit(:purchase_id,:purchase_name, :item_number,:price, :comment)
-  end
+  # def supplier_purchases_params
+  #   params.require(:supplier_purchase).permit(:purchase_id,:purchase_name, :item_number,:price, :comment)
+  # end
 
 
 end
+
+

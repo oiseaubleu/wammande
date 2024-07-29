@@ -32,14 +32,14 @@
 # end
 
 # # purchase---------------------------------------------
-# #purchase_test = Purchase.new(name: "仕入品sample", item_number: "001A", is_food: true)
-# 10.times do |n|
-#   Purchase.create!(name: "仕入食材#{n+1}", item_number: "01#{n+1}A", is_food: true )
-# end
+#purchase_test = Purchase.new(name: "仕入品sample", item_number: "001A", is_food: true)
+10.times do |n|
+  Purchase.create!(name: "仕入食材#{n+1}", is_food: true )
+end
 
-# 10.times do |n|
-#   Purchase.create!(name: "仕入品#{n+1}", item_number: "10#{n+1}A", is_food: false )
-# end
+10.times do |n|
+  Purchase.create!(name: "仕入品#{n+1}", is_food: false )
+end
  
 ## # supplier---------------------------------------------
 # #supplier_sample = Supplier.new(name: "仕入先", cycle_value: 7, cycle_unit: 0, how_to_order: 1)
@@ -52,11 +52,11 @@
 # end
 
 ## # supplier_purchase---------------------------------------------
-# #supplier_purchase_sample = SupplierPurchase.new(supplier_id: 13, purchase_id: 1, price: 20, version: 0, purchase_count: 0)
-# 5.times do |n|
-#   SupplierPurchase.create!(supplier_id: Supplier.first.id, purchase_id: n+1, price: n+10, version: 0, purchase_count: 0, comment:"コメント#{n+1}")
-# end
-# 5.times do |n|
-#   SupplierPurchase.create!(supplier_id: Supplier.last.id, purchase_id: n+1, price: n+20, version: 0, purchase_count: 0, comment:"コメント#{n+1}")
-# end
+#supplier_purchase_sample = SupplierPurchase.new(supplier_id: 13, purchase_id: 1, price: 20, version: 0, purchase_count: 0)
+5.times do |n|
+  SupplierPurchase.create!(supplier_id: Supplier.first.id, purchase_id: n+1, price: n+10, version: 0, purchase_count: 0, comment:"コメント#{n+1}", item_number: "01#{n+1}A")
+end
+5.times do |n|
+  SupplierPurchase.create!(supplier_id: Supplier.last.id, purchase_id: n+1, price: n+20, version: 0, purchase_count: 0, comment:"コメント#{n+1}", item_number: "10#{n+1}A")
+end
 
