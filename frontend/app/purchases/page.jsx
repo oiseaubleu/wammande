@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // 既存の仕入品を編集するためのコンポーネント
 function PurchaseRow({ purchase, onSave, onDelete }) {
@@ -142,21 +142,47 @@ function NewPurchaseForm({ onSave, onCancel }) {
 
 // 仕入品一覧ページのコンポーネント
 export default function Page() {
-  const [purchases, setPurchases] = useState([
-    { id: 1, name: "米", isIngredient: true },
-    { id: 2, name: "豚肉", isIngredient: true },
-    { id: 3, name: "牛肉", isIngredient: true },
-    { id: 4, name: "ラップ", isIngredient: false },
-  ]);
+  const [purchases, setPurchases] = useState([]);
+  // 配列の中身はこんな感じ
+  // {id: 1, name: '仕入品sample', is_food: true, created_at: '2024-07-24T08:17:34.642Z', updated_at: '2024-07-24T08:17:34.642Z'}
   const [isAdding, setIsAdding] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ページが読み込まれたときに、APIからデータを取ってくる
+  useEffect(() => {
+    async function fetchData() {
+      const res = await fetch("http://localhost:3000/purchases", {
+        mode: "cors",
+      });
+      const data = await res.json();
+      console.log(data);
+      setPurchases(data);
+      setIsLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const handleAddNew = () => {
     setIsAdding(true);
   };
 
   const handleSaveNewPurchase = (newPurchase) => {
-    setPurchases([...purchases, { id: purchases.length + 1, ...newPurchase }]);
-    setIsAdding(false);
+    async function registerData() {
+      const res = await fetch("http://localhost:3000/purchases", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newPurchase),
+      });
+      const data = await res.json();
+      console.log(data);
+      setPurchases([...purchases, data]);
+      console.log(purchases);
+      setIsAdding(false);
+    }
+    registerData();
   };
 
   const handleCancelNewPurchase = () => {
@@ -164,15 +190,49 @@ export default function Page() {
   };
 
   const handleSave = (id, updatedPurchase) => {
-    setPurchases(
-      purchases.map((purchase) =>
-        purchase.id === id ? { ...purchase, ...updatedPurchase } : purchase
-      )
-    );
+    async function updateData() {
+      // TODO: 更新失敗した場合は、再読み込みするまでデータがずれた状態となる
+      // 本当は成功するまで「更新中...」みたいな表示を出すべき
+      const res = await fetch(`http://localhost:3000/purchases/${id}`, {
+        method: "PUT",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedPurchase),
+      });
+      if (res.status >= 400) {
+        alert("更新に失敗しました。");
+        setPurchases(purchases);
+      } else {
+        const data = await res.json();
+        console.log(data);
+        setPurchases(
+          purchases.map((purchase) =>
+            purchase.id === data.id ? data : purchase
+          )
+        );
+      }
+    }
+    updateData();
   };
 
   const handleDelete = (id) => {
-    setPurchases(purchases.filter((purchase) => purchase.id !== id));
+    async function deleteData() {
+      const purchasesBeforeDelete = [...purchases];
+      const res = await fetch(`http://localhost:3000/purchases/${id}`, {
+        method: "DELETE",
+        mode: "cors",
+      });
+      if (res.status >= 400) {
+        setPurchases(purchasesBeforeDelete);
+        alert("削除に失敗しました。");
+        // TODO: エラー表示を出す。Next.jsの何かがあったはず…
+      } else {
+        setPurchases(purchases.filter((purchase) => purchase.id !== id));
+      }
+    }
+    deleteData();
   };
 
   return (
@@ -197,39 +257,31 @@ export default function Page() {
           </button>
         </div>
 
-        <table className="w-full table-auto">
-          <thead>
-          <tr className="bg-gray-200">
-              <th className="px-4 py-2">仕入品名</th>
-              <th className="px-4 py-2">食材check</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-            {purchases.map((purchase) => (
-              <PurchaseRow
-                key={purchase.id}
-                purchase={purchase}
-                onSave={handleSave}
-                onDelete={handleDelete}
-              />
-            ))}
-          </tbody>
-        </table>
-        {isAdding && (
+        {isLoading ? (
+          <p>読み込み中...</p>
+        ) : (
           <table className="w-full table-auto">
             <thead>
-              <tr>
+              <tr className="bg-gray-200">
                 <th className="px-4 py-2">仕入品名</th>
                 <th className="px-4 py-2">食材check</th>
-                <th className="px-4 py-2"></th>
               </tr>
             </thead>
             <tbody>
-              <NewPurchaseForm
-                onSave={handleSaveNewPurchase}
-                onCancel={handleCancelNewPurchase}
-              />
+              {purchases.map((purchase) => (
+                <PurchaseRow
+                  key={purchase.id}
+                  purchase={purchase}
+                  onSave={handleSave}
+                  onDelete={handleDelete}
+                />
+              ))}
+              {isAdding && (
+                <NewPurchaseForm
+                  onSave={handleSaveNewPurchase}
+                  onCancel={handleCancelNewPurchase}
+                />
+              )}
             </tbody>
           </table>
         )}

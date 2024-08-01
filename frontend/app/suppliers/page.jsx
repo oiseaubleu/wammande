@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 // 仕入先一覧ページのコンポーネント
 export default function Page() {
@@ -51,12 +52,18 @@ export default function Page() {
               <td className="px-4 py-2">{supplier.name}</td>
               <td className="px-4 py-2">{supplier.next_purchase_day}</td>
               <td className="px-4 py-2 flex space-x-2">
-              <button
+              {/* <button
                   onClick={() => handleEdit(supplier.id)}
+                  
                   className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
                 >
                   詳細
-                </button>
+                </button> */}
+                <Link href={`/suppliers/${supplier.id}`}>
+                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
+                      詳細 
+                    </button>
+                  </Link>
                 <button
                   onClick={() => handleEdit(supplier.id)}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
