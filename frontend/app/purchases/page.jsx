@@ -6,12 +6,10 @@ import { useState, useEffect } from "react";
 function PurchaseRow({ purchase, onSave, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(purchase.name);
-  const [isIngredient, setIsIngredient] = useState(
-    purchase.isIngredient || false
-  );
+  const [isIngredient, setIsIngredient] = useState(purchase.is_food || false);
 
   const handleSave = () => {
-    onSave(purchase.id, { name: editName, isIngredient });
+    onSave(purchase.id, { name: editName, is_food: isIngredient });
     setIsEditing(false);
   };
 
@@ -26,7 +24,9 @@ function PurchaseRow({ purchase, onSave, onDelete }) {
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         ) : (
-          <span>{purchase.name}</span>
+          <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            {purchase.name}
+          </span>
         )}
       </td>
       <td className="flex justify-center">
@@ -258,7 +258,9 @@ export default function Page() {
         </div>
 
         {isLoading ? (
-          <p>読み込み中...</p>
+          <div className="flex justify-center" aria-label="読み込み中">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+          </div>
         ) : (
           <table className="w-full table-auto">
             <thead>
