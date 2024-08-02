@@ -149,10 +149,11 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
 
   // ページが読み込まれたときに、APIからデータを取ってくる
+  //最初に取ってくるだけでいい（追加の時は再レンダリング不要なので）ので空配列渡す
   useEffect(() => {
     async function fetchData() {
       const res = await fetch("http://localhost:3000/purchases", {
-        mode: "cors",
+        mode: "cors", //ただのGETなのでmethod不要
       });
       const data = await res.json();
       console.log(data);

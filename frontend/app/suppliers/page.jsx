@@ -6,18 +6,34 @@ import Link from "next/link";
 // 仕入先一覧ページのコンポーネント
 export default function Page() {
   const [suppliers, setSuppliers] = useState([]);
-  const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
+  //ページが読み込まれたときにAPIからデータを取ってくる
   useEffect(() => {
-    setIsClient(true);
-    // サンプルデータの設定
-    setSuppliers([
-      { id: 1, name: "MONOPRIX", next_purchase_day: "2024/08/01" },
-      { id: 2, name: "CARREFOUR", next_purchase_day: "2024/08/01" },
-      { id: 3, name: "GÉANT", next_purchase_day: "2024/08/01" },
-      { id: 4, name: "UNILEVER", next_purchase_day: "2024/08/01" },
-    ]);
+    async function fetchData() {
+      const res = await fetch("http://localhost:3000/suppliers", {
+        mode: "cors",
+      });
+      const data = await res.json();
+      console.log(data);
+      setSuppliers(data);
+      setIsLoading(false);
+    }
+    fetchData();
   }, []);
+
+  //const [isClient, setIsClient] = useState(false);
+
+  // useEffect(() => {
+  //   setIsClient(true);
+  //   // サンプルデータの設定
+  //   setSuppliers([
+  //     { id: 1, name: "MONOPRIX", next_purchase_day: "2024/08/01" },
+  //     { id: 2, name: "CARREFOUR", next_purchase_day: "2024/08/01" },
+  //     { id: 3, name: "GÉANT", next_purchase_day: "2024/08/01" },
+  //     { id: 4, name: "UNILEVER", next_purchase_day: "2024/08/01" },
+  //   ]);
+  // }, []);
 
   const handleDelete = (id) => {
     setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
@@ -28,9 +44,9 @@ export default function Page() {
     console.log("Editing supplier with id:", id);
   };
 
-  if (!isClient) {
-    return null; // クライアントサイドでのみレンダリングする
-  }
+  // if (!isClient) {
+  //   return null; // クライアントサイドでのみレンダリングする
+  // }
 
   return (
     <div>
@@ -43,7 +59,6 @@ export default function Page() {
           <tr className="bg-gray-200">
             <th className="px-4 py-2">仕入先名</th>
             <th className="px-4 py-2">次回発注日</th>
-          
           </tr>
         </thead>
         <tbody>
@@ -52,7 +67,7 @@ export default function Page() {
               <td className="px-4 py-2">{supplier.name}</td>
               <td className="px-4 py-2">{supplier.next_purchase_day}</td>
               <td className="px-4 py-2 flex space-x-2">
-              {/* <button
+                {/* <button
                   onClick={() => handleEdit(supplier.id)}
                   
                   className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
@@ -60,10 +75,10 @@ export default function Page() {
                   詳細
                 </button> */}
                 <Link href={`/suppliers/${supplier.id}`}>
-                    <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
-                      詳細 
-                    </button>
-                  </Link>
+                  <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
+                    詳細
+                  </button>
+                </Link>
                 <button
                   onClick={() => handleEdit(supplier.id)}
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
