@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function OrderList() {
   const { id } = useParams();
@@ -134,12 +135,11 @@ export default function OrderList() {
               <td className="py-2 px-4 border-b">{order.order_status}</td>
               <td className="py-2 px-4 border-b">€{order.total_amount}</td>
               <td className="py-2 px-4 border-b">
-                <button
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                  onClick={() => console.log(`Details for order ${order.id}`)}
-                >
-                  詳細
-                </button>
+                <Link href={`/orders/${order.id}`}>
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                    詳細
+                  </button>
+                </Link>
               </td>
             </tr>
           ))}
