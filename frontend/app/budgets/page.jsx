@@ -37,7 +37,7 @@ function BudgetRow({ budget, onSave, onDelete }) {
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         ) : (
-          <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             {budget.year}
           </span>
         )}
@@ -52,14 +52,14 @@ function BudgetRow({ budget, onSave, onDelete }) {
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         ) : (
-          <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             {budget.month}
           </span>
         )}
       </td>
 
       <td>
-        <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           残額いれたい
         </span>
       </td>
@@ -73,7 +73,7 @@ function BudgetRow({ budget, onSave, onDelete }) {
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         ) : (
-          <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             {budget.purchase_budget}
           </span>
         )}
@@ -88,14 +88,14 @@ function BudgetRow({ budget, onSave, onDelete }) {
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         ) : (
-          <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             {budget.alert_threshold}
           </span>
         )}
       </td>
 
       <td>
-        <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           使用率いれたい
         </span>
       </td>
@@ -109,7 +109,7 @@ function BudgetRow({ budget, onSave, onDelete }) {
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
         ) : (
-          <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+          <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
             {budget.comment}
           </span>
         )}
@@ -120,7 +120,7 @@ function BudgetRow({ budget, onSave, onDelete }) {
           <>
             <button
               onClick={handleSave}
-              className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-blue-700"
+              className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
             >
               保存
             </button>
@@ -190,7 +190,7 @@ function NewBudgetForm({ onSave, onCancel }) {
         />
       </td>
       <td>
-        <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           0
         </span>
       </td>
@@ -211,7 +211,7 @@ function NewBudgetForm({ onSave, onCancel }) {
         />
       </td>
       <td>
-        <span className="block py-1.5 text-gray-900 shadow-sm  focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+        <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           0
         </span>
       </td>
@@ -313,13 +313,13 @@ export default function BudgetList() {
 
   const handleDelete = (id) => {
     async function deleteData() {
-      const budegetBeforeDelete = [...budgets];
+      const budgetBeforeDelete = [...budgets];
       const res = await fetch(`http://localhost:3000/budgets/${id}`, {
         method: "DELETE",
         mode: "cors",
       });
       if (res.status >= 400) {
-        setBudgets(budegetBeforeDelete);
+        setBudgets(budgetBeforeDelete);
         alert("削除に失敗しました。");
       } else {
         setBudgets(budgets.filter((budget) => budget.id !== id));
@@ -360,6 +360,12 @@ export default function BudgetList() {
             </tr>
           </thead>
           <tbody>
+            {isAdding && (
+              <NewBudgetForm
+                onSave={handleSaveNewBudgets}
+                onCancel={handleCancelNewBudget}
+              />
+            )}
             {budgets.map((budget) => (
               <BudgetRow
                 key={budget.id}
@@ -368,12 +374,6 @@ export default function BudgetList() {
                 onDelete={handleDelete}
               />
             ))}
-            {isAdding && (
-              <NewBudgetForm
-                onSave={handleSaveNewBudgets}
-                onCancel={handleCancelNewBudget}
-              />
-            )}
           </tbody>
         </table>
       )}
