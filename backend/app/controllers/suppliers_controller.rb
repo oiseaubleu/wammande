@@ -11,7 +11,7 @@ class SuppliersController < ApplicationController
   # 仕入先の新規登録##########
   def create
     @supplier = Supplier.new(supplier_params)
-    binding.irb
+    # #binding.irb
 
     if @supplier.save
       render json: @supplier, status: :created, include: :supplier_purchases # 201
