@@ -194,6 +194,7 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
 // OrderRow コンポーネント
 function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }) {
   const [supplierPurchaseId, setSupplierPurchaseId] = useState(null);
+  const [price, setPrice] = useState(0);
   const [selectedItemNumber, setSelectedItemNumber] = useState("");
   const inputRef = useRef();
 
@@ -212,12 +213,15 @@ function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }) {
 
   const itemSelected = (id) => {
     setSupplierPurchaseId(id);
-    const itemNumber = supplierPurchases.find(
-      (purchase) => purchase.id === id
-    ).item_number;
+    const targetSupplierPurchase = supplierPurchases.find(
+      (supplierPurchase) => supplierPurchase.id === id
+    );
+    const itemNumber = targetSupplierPurchase.item_number;
     setSelectedItemNumber(itemNumber ? itemNumber : "none");
+    setPrice(targetSupplierPurchase.price);
+
     handleUpdate("supplier_purchase_id", id);
-    console.log(supplierPurchases[id]);
+    console.log(id, supplierPurchases[id], supplierPurchases);
   };
 
   return (
@@ -250,7 +254,7 @@ function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }) {
       <td>
         <input
           type="number"
-          value={supplierPurchases[supplierPurchaseId]?.price}
+          value={price}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           readOnly
         />
