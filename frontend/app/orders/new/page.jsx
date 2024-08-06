@@ -159,7 +159,7 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
   };
   //選択されたら、検索ワードを更新して、ドロップダウンメニューを閉じる
   const handleItemSelected = (purchase) => {
-    setSearchTerm(purchase.name);
+    setSearchTerm(purchase.purchase_name);
     setShowDropdown(false);
     itemSelected(purchase.id);
   };
@@ -283,6 +283,11 @@ export default function OrderRegistration() {
     setSupplierName(suppliers.find((supplier) => supplier.id === id).name);
     setPurchases(
       suppliers.find((supplier) => supplier.id === id).supplier_purchases
+    );
+    setOrderDate(
+      suppliers
+        .find((supplier) => supplier.id === id)
+        .next_purchase_day.split("T")[0]
     );
   };
 
