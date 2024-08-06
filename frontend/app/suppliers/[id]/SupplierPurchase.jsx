@@ -61,7 +61,7 @@ function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
  *
  */
 
-function SupplierName({ purchases, inputRef, isEditing, itemSelected }) {
+function PurchaseName({ purchases, inputRef, isEditing, itemSelected }) {
   const [searchTerm, setSearchTerm] = useState(""); //検索ワード
   const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
 
@@ -218,7 +218,7 @@ function SupplierPurchase({
         <div ref={inputRef}>
           <input type="hidden" value={purchaseId} />
           {supplierPurchase.isNewItem ? (
-            <SupplierName
+            <PurchaseName
               purchases={purchasesForDropdown}
               inputRef={inputRef}
               isEditing={isEditing}

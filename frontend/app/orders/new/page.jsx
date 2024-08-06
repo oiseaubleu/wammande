@@ -1,7 +1,196 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
+/***********************************************
+ * 仕入先情報を取得
+ ************************************************/
+
+function fetchSuppliers() {
+  return fetch("http://localhost:3000/orders/new", { mode: "cors" })
+    .then((response) => response.json())
+    .catch((error) => console.error("Error fetching suppliers:", error));
+}
+
+/***********************************************
+ * 仕入先名のドロップダウンメニュー
+ ************************************************/
+
+function SupplierNameDropdown({ suppliers, searchTerm, onSelect, parentRef }) {
+  const filteredSuppliers = suppliers.filter((supplier) =>
+    supplier.name.includes(searchTerm)
+  );
+
+  return (
+    <ul
+      className="absolute bg-white border border-gray-300 shadow-lg z-10 max-h-48 overflow-auto"
+      style={{
+        width: parentRef.current ? parentRef.current.offsetWidth : "100%",
+      }}
+    >
+      {filteredSuppliers.map((supplier) => (
+        <li
+          key={supplier.id}
+          className="px-4 py-2 hover:bg-indigo-200 cursor-pointer"
+          onMouseDown={() => {
+            onSelect(supplier);
+          }}
+        >
+          {supplier.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/***********************************************
+ * 仕入先名の入力フォーム
+ ************************************************/
+function SupplierName({ suppliers, inputRef, supplierSelected }) {
+  const [searchTerm, setSearchTerm] = useState(""); //検索ワード
+  const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
+
+  // ドロップダウンメニューの外側をクリックしたら閉じる
+  const dropdownRef = useRef();
+  useEffect(() => {
+    document.addEventListener("mousedown", (e) => {
+      // ドロップダウンメニューの外側をクリックしたら閉じる
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    });
+  }, []);
+  //検索ワードが変わるたびに、ドロップダウンメニューを表示する
+  const handleInputChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    if (term) {
+      setShowDropdown(true);
+    }
+  };
+  //選択されたら、検索ワードを更新して、ドロップダウンメニューを閉じる
+  const handleSupplierSelected = (supplier) => {
+    setSearchTerm(supplier.name);
+    setShowDropdown(false);
+    supplierSelected(supplier.id);
+  };
+
+  return (
+    <>
+      <input
+        type="text"
+        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center`}
+        value={searchTerm}
+        onChange={handleInputChange}
+        onFocus={() => setShowDropdown(true)}
+        required
+      />
+      {showDropdown && (
+        <div ref={dropdownRef}>
+          <SupplierNameDropdown
+            suppliers={suppliers}
+            searchTerm={searchTerm}
+            onSelect={handleSupplierSelected}
+            parentRef={inputRef}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+/***********************************************
+ * 仕入品名のドロップダウンメニュー
+ ************************************************/
+
+function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
+  const filteredPurchases = purchases.filter((purchase) =>
+    purchase.name.includes(searchTerm)
+  );
+
+  return (
+    <ul
+      className="absolute bg-white border border-gray-300 shadow-lg z-10 max-h-48 overflow-auto"
+      style={{
+        width: parentRef.current ? parentRef.current.offsetWidth : "100%",
+      }}
+    >
+      {filteredPurchases.map((purchase) => (
+        <li
+          key={purchase.id}
+          className="px-4 py-2 hover:bg-indigo-200 cursor-pointer"
+          onMouseDown={() => {
+            onSelect(purchase);
+          }}
+        >
+          {purchase.name}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/***********************************************
+ * 仕入品名の入力フォーム
+ ************************************************/
+function PurchaseName({ purchases, inputRef, isEditing, itemSelected }) {
+  const [searchTerm, setSearchTerm] = useState(""); //検索ワード
+  const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
+
+  // ドロップダウンメニューの外側をクリックしたら閉じる
+  const dropdownRef = useRef();
+  useEffect(() => {
+    document.addEventListener("mousedown", (e) => {
+      // ドロップダウンメニューの外側をクリックしたら閉じる
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    });
+  }, []);
+  //検索ワードが変わるたびに、ドロップダウンメニューを表示する
+  const handleInputChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    if (term) {
+      setShowDropdown(true);
+    }
+  };
+  //選択されたら、検索ワードを更新して、ドロップダウンメニューを閉じる
+  const handleItemSelected = (purchase) => {
+    setSearchTerm(purchase.name);
+    setShowDropdown(false);
+    itemSelected(purchase.id);
+  };
+
+  return (
+    <>
+      <input
+        type="text"
+        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center ${!isEditing ? "bg-gray-200" : ""}`}
+        value={searchTerm}
+        onChange={handleInputChange}
+        onFocus={() => setShowDropdown(true)}
+        required
+      />
+      {isEditing && showDropdown && (
+        <div ref={dropdownRef}>
+          <PurchaseNameDropdown
+            purchases={purchases}
+            searchTerm={searchTerm}
+            onSelect={handleItemSelected}
+            parentRef={inputRef}
+          />
+        </div>
+      )}
+    </>
+  );
+}
+
+////////////////////////////////////////////////////////////////////
+
+// OrderRow コンポーネント
 function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
   const handleUpdate = (field, value) => {
     onUpdate(index, { ...order, [field]: value });
@@ -16,9 +205,14 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
   }, [order.quantity, order.unit_price]);
 
   return (
-    <tr>
+    <tr ref={inputRef}>
       <td>
-        <select
+        <PurchaseName
+          purchases={purchases}
+          inputRef={inputRef}
+          itemSelected={itemSelected}
+        />
+        {/* <select
           value={order.purchase_id}
           onChange={(e) => handleUpdate("purchase_id", e.target.value)}
         >
@@ -27,7 +221,7 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
               {purchase.name}
             </option>
           ))}
-        </select>
+        </select> */}
       </td>
       <td>
         <input
@@ -73,23 +267,37 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
   );
 }
 
+// OrderRegistration コンポーネント
 export default function OrderRegistration() {
   const [orders, setOrders] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [supplierName, setSupplierName] = useState("");
+  const [supplierId, setSupplierId] = useState("");
   const [orderDate, setOrderDate] = useState("");
   const [status, setStatus] = useState("未発注");
   const [totalAmount, setTotalAmount] = useState(0);
+  const inputRef = useRef();
+
+  const supplierSelected = (id) => {
+    setSupplierName(suppliers.find((supplier) => supplier.id === id).name);
+    setPurchases(suppliers.find((supplier) => supplier.id === id).purchases);
+  };
 
   useEffect(() => {
-    async function fetchPurchases() {
-      const res = await fetch("http://localhost:3000/purchases", {
-        mode: "cors",
-      });
-      const data = await res.json();
-      setPurchases(data);
+    async function fetchData() {
+      const suppliersData = await fetchSuppliers();
+      // const allPurchases = suppliersData.flatMap((supplier) =>
+      //   supplier.supplier_purchases.map((purchase) => ({
+      //     ...purchase,
+      //     supplier_name: supplier.name,
+      //   }))
+      // );
+      setSuppliers(suppliersData);
+      //setPurchases(allPurchases);
     }
-    fetchPurchases();
+
+    fetchData();
   }, []);
 
   const handleAddRow = () => {
@@ -136,9 +344,6 @@ export default function OrderRegistration() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">発注登録</h1>
-        <div>
-          <span>現在の予算残額: €3000</span>
-        </div>
       </div>
 
       <div className="mb-4">
@@ -149,16 +354,14 @@ export default function OrderRegistration() {
       <div className="mb-8">
         <h2 className="text-xl font-semibold mb-2">発注先情報</h2>
         <div className="grid grid-cols-2 gap-4">
-          <div>
+          <div ref={inputRef}>
             <label className="block text-sm font-medium">仕入先名</label>
-            <select
-              value={supplierName}
-              onChange={(e) => setSupplierName(e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            >
-              <option value="">選択してください</option>
-              {/* 仕入先のオプションを追加 */}
-            </select>
+            <SupplierName
+              suppliers={suppliers}
+              inputRef={inputRef}
+              supplierSelected={supplierSelected}
+            />
+            {/* 仕入先のオプションを追加 */}
           </div>
           <div>
             <label className="block text-sm font-medium">発注日目安日</label>
