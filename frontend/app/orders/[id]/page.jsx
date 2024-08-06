@@ -34,20 +34,20 @@ export default function OrderDetail() {
 
   useEffect(() => {
     async function fetchPurchaseData() {
-      const res = await fetch(`http://localhost:3000/purchases`, {
+      const res = await fetch(`http://localhost:3000/suppliers/${order.supplier_id}`, {
         mode: "cors",
       });
-      const purchaseList = await res.json();
-      console.log(purchaseList);
+      const supplier = await res.json();
+      console.log(supplier);
       setPurchases(
-        purchaseList.reduce(
+        supplier.supplier_purchases.reduce(
           (obj, item) => ((obj[item.id] = { ...item }), obj),
           {}
         )
       );
     }
     fetchPurchaseData();
-  }, []);
+  }, [order.supplier_id]);
 
   const handleEdit = () => {
     console.log("Edit button clicked");
@@ -114,17 +114,17 @@ export default function OrderDetail() {
             </tr>
           </thead>
           <tbody>
-            {order.order_details.map((item) => (
+            {order.order_details.map((item, index) => (
               <tr key={item.id}>
                 <td className="py-2 px-4 border-b">
-                  {purchases[item.supplier_purchase_id]?.name || "不明"}
+                  {item.purchase_name || "不明"}
                 </td>
                 <td className="py-2 px-4 border-b">
                   {purchases[item.supplier_purchase_id]?.item_number || "不明"}
                 </td>
                 <td className="py-2 px-4 border-b">{item.quantity}</td>
                 <td className="py-2 px-4 border-b">
-                  {purchases[item.supplier_purchase_id]?.item_price || "不明"}
+                  {purchases[item.supplier_purchase_id]?.price || "不明"}
                 </td>
                 <td className="py-2 px-4 border-b">{item.subtotal_amount}</td>
                 <td className="py-2 px-4 border-b">{item.order_status}</td>
