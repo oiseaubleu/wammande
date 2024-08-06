@@ -1,130 +1,83 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
+import SupplierPurchase from "./SupplierPurchase";
+import useSupplier from "./useSupplier";
 import Link from "next/link";
-
-function SupplierPurchase({
-  index,
-  supplierPurchase,
-  purchases,
-  isEditing,
-  onChange,
-}) {
-  const [purchaseId, setPurchaseId] = useState(supplierPurchase.id);
-  const [itemNumber, setItemNumber] = useState(supplierPurchase.item_number);
-  const [price, setPrice] = useState(supplierPurchase.price);
-  const [comment, setComment] = useState(supplierPurchase.comment);
-
-  // 仕入れ品の名前で検索する→選択したらPurchase IDを更新する→表示されてる名前も変わる
-  // 仕入れ品の変更があった場合、親のコンポーネントが持っているStateをいい感じに更新してあげる必要がある
-  // なんだけど、個々のSupplierPurchaseに保存ボタンを持つとうざいので、裏でいい感じに更新しないといけない
-  return (
-    <tr key={index}>
-      {" "}
-      {/* ここのindexは何行目かを表すだけ */}
-      <td className="py-2 px-4 border-b">
-        <input
-          type="text"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center"
-          value={purchases[purchaseId].name}
-          readOnly={!isEditing}
-        />
-      </td>
-      <td className="py-2 px-4 border-b">
-        <input
-          type="text"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center"
-          value={itemNumber}
-          onChange={(e) => {
-            setItemNumber(e.target.value);
-            onChange(supplierPurchase.id, {
-              id: purchaseId,
-              item_number: itemNumber,
-              price: price,
-              comment: comment,
-            });
-          }}
-          readOnly={!isEditing}
-        />
-      </td>
-      <td className="py-2 px-4 border-b">
-        <input
-          type="text"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          readOnly={!isEditing}
-        />
-      </td>
-      <td className="py-2 px-4 border-b">
-        <input
-          type="text"
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          readOnly={!isEditing}
-        />
-      </td>
-      {/* <td className="py-2 px-4 border-b">
-      <button className="bg-red-500 text-white rounded px-4 py-2 hover:bg-red-700" onClick={() => handleDeleteItem(index)}>削除</button>
-    </td> */}
-    </tr>
-  );
-}
 
 export default function SupplierDetail() {
   const { id } = useParams();
-  const [supplier, setSupplier] = useState(null);
-  const [purchases, setPurchases] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-
+  const {
+    supplier,
+    purchases,
+    isLoading,
+    isEditing,
+    updateSupplier,
+    updateSupplierPurchase,
+    replaceSupplierPurchase,
+    addTentativeSupplierPurchase,
+    setIsEditing,
+    saveSupplier,
+  } = useSupplier(id);
+  // next_purchase_day の表示用。↑の `supplier` ではDateオブジェクトで、そのまま `input` に表示しづらい
+  const [nextPurchaseDay, setNextPurchaseDayString] = useState("");
   useEffect(() => {
-    async function fetchSupplierData() {
-      if (id) {
-        const res = await fetch(`http://localhost:3000/suppliers/${id}`, {
-          mode: "cors",
-        });
-        const data = await res.json();
-        console.log(data);
-        setSupplier(data);
-        setIsLoading(false);
-      }
+    if (supplier.next_purchase_day) {
+      const date = new Date(supplier.next_purchase_day);
+      setNextPurchaseDayString(date.toISOString().split("T")[0]);
     }
-    fetchSupplierData();
-  }, [id]);
+  }, [supplier.next_purchase_day]);
 
+  const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
   useEffect(() => {
-    async function fetchPurchaseData() {
-      const res = await fetch(`http://localhost:3000/purchases`, {
-        mode: "cors",
-      });
-      const purchaseList = await res.json();
-      console.log(purchaseList);
-      setPurchases(
-        // ここで、オブジェクトの配列→オブジェクトに変換してる！ [{id:1, ...}, {id:2, ...}, {}] -> {1: {}, 2: {}, ...}
-        // こうすることで、PurchaseのIDから目的のPurchaseオブジェクトにすぐにたどり着けるようになる
-        purchaseList.reduce(
-          (obj, item) => ((obj[item.id] = { ...item }), obj),
-          {}
-        )
-      );
+    console.log("mode", searchParams.get("mode"));
+    if (searchParams.get("mode") === "edit") {
+      setIsEditing(true);
     }
-    fetchPurchaseData();
-  }, []);
-
-  const editSupplierPurchase = (id, supplierPurchase) => {
-    const updatedSupplierPurchases = supplier.supplier_purchases.map((item) =>
-      item.id === id ? supplierPurchase : item
-    );
-    setSupplier({ supplier_purchases: updatedSupplierPurchases, ...supplier });
-    console.log(supplier);
-  };
+  }, [searchParams]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  //すべてtrueのときだけtrue返すので、保存してもいい状態かどうか調べてる
+  const isSafeToSave = supplier.supplier_purchases.every(
+    (purchase) =>
+      purchase._destroy || //削除ボタンが押された状態{_destory: true} これから消すレコードについてはバリデーションしない
+      !purchase.validationErrors ||
+      purchase.validationErrors.length === 0
+  );
+
+  //ボタンの出し分け
+  const saveOrEditButton = isEditing ? (
+    <>
+      <button
+        className={`text-white rounded px-4 py-2
+          ${isSafeToSave ? "bg-blue-500 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"} `}
+        disabled={!isSafeToSave}
+        onClick={() => {
+          setIsEditing(false); /* 本当はここで保存処理 */
+          saveSupplier(supplier);
+        }}
+      >
+        保存
+      </button>
+      <button
+        className="bg-blue-700 text-white rounded px-4 py-2 hover:bg-blue-800"
+        onClick={() => addTentativeSupplierPurchase()}
+      >
+        新規追加
+      </button>
+    </>
+  ) : (
+    <button
+      className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
+      onClick={() => setIsEditing(true)}
+    >
+      編集
+    </button>
+  );
 
   return (
     <div className="p-8">
@@ -141,27 +94,36 @@ export default function SupplierDetail() {
               type="text"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               value={supplier.name}
-              readOnly
+              onChange={(e) => updateSupplier("name", e.target.value)}
+              readOnly={!isEditing}
             />
           </div>
           <div>
             <label className="block text-sm font-medium">発注方法</label>
-            <input
-              type="text"
+            <select
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               value={supplier.how_to_order}
-              readOnly
-            />
+              onChange={(e) => updateSupplier("how_to_order", e.target.value)}
+              disabled={!isEditing}
+            >
+              <option value="application">アプリ</option>
+              <option value="direct">直接</option>
+              <option value="online">オンライン</option>
+              <option value="email">メール</option>
+            </select>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 mt-4">
           <div>
             <label className="block text-sm font-medium">次回発注予定日</label>
             <input
-              type="text"
+              type="date"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              value={supplier.next_purchase_day}
-              readOnly
+              value={nextPurchaseDay}
+              onChange={(e) => {
+                updateSupplier("next_purchase_day", e.target.value);
+              }}
+              readOnly={!isEditing}
             />
           </div>
           <div>
@@ -171,14 +133,20 @@ export default function SupplierDetail() {
                 type="text"
                 className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 value={supplier.cycle_value}
-                readOnly
+                onChange={(e) => updateSupplier("cycle_value", e.target.value)}
+                readOnly={!isEditing}
               />
-              <input
-                type="text"
+              <select
                 className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 value={supplier.cycle_unit}
-                readOnly
-              />
+                onChange={(e) => updateSupplier("cycle_unit", e.target.value)}
+                disabled={!isEditing}
+              >
+                <option value="daily">日</option>
+                <option value="weekly">週</option>
+                <option value="monthly">月</option>
+                <option value="yearly">年</option>
+              </select>
               <span className="ml-2">ごと</span>
             </div>
           </div>
@@ -198,29 +166,29 @@ export default function SupplierDetail() {
             </tr>
           </thead>
           <tbody>
-            {supplier.supplier_purchases.map((item, index) => (
-              <SupplierPurchase
-                key={index}
-                supplierPurchase={item}
-                purchases={purchases}
-                isEditing={isEditing}
-                onChange={editSupplierPurchase}
-              />
-            ))}
+            {supplier.supplier_purchases.map(
+              (item, index) =>
+                !item._destroy && ( //この時点で削除フラグがついたものが抜ける
+                  <SupplierPurchase
+                    key={item.id}
+                    supplierPurchase={item}
+                    purchases={purchases}
+                    selectedPurchaseIds={supplier.supplier_purchases
+                      .filter((purchase) => !purchase._destroy)
+                      .map((purchase) => purchase.purchase_id)}
+                    isEditing={isEditing}
+                    onChange={updateSupplierPurchase}
+                    //onDelete={deleteSupplierPurchase}
+                    replaceItem={replaceSupplierPurchase}
+                  />
+                )
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="flex justify-between">
-        <button
-          className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
-          onClick={() => {
-            setIsEditing(true);
-            console.log(`IsEditing enabled ${isEditing}`);
-          }}
-        >
-          編集
-        </button>
+        {saveOrEditButton}
         <Link href={`/suppliers`}>
           <button className="bg-gray-500 text-white rounded px-4 py-2 hover:bg-gray-700">
             戻る
@@ -230,8 +198,3 @@ export default function SupplierDetail() {
     </div>
   );
 }
-
-const handleDeleteItem = (index) => {
-  console.log(`Deleting item at index: ${index}`);
-  // アイテムの削除ロジックを実装します。
-};

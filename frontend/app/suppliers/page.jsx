@@ -36,7 +36,16 @@ export default function Page() {
   // }, []);
 
   const handleDelete = (id) => {
-    setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+    async function deleteData(id) {
+      const res = await fetch(`http://localhost:3000/suppliers/${id}`, {
+        method: "DELETE",
+        mode: "cors",
+      });
+      setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
+    }
+    if (confirm("この仕入先を本当に削除しますか?")) {
+      deleteData(id);
+    }
   };
 
   const handleEdit = (id) => {
@@ -50,10 +59,12 @@ export default function Page() {
 
   return (
     <div>
-      <button className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
-        新規追加
-      </button>
-      {/* Render suppliers data */}
+      <Link href="/suppliers/new?mode=edit">
+        <button className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
+          新規追加
+        </button>
+      </Link>
+      {/* 仕入先データ */}
       <table className="w-full table-auto mt-4">
         <thead>
           <tr className="bg-gray-200">
@@ -79,12 +90,14 @@ export default function Page() {
                     詳細
                   </button>
                 </Link>
-                <button
-                  onClick={() => handleEdit(supplier.id)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-                >
-                  編集
-                </button>
+                <Link href={`/suppliers/${supplier.id}?mode=edit`}>
+                  <button
+                    onClick={() => handleEdit(supplier.id)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                  >
+                    編集
+                  </button>
+                </Link>
                 <button
                   onClick={() => handleDelete(supplier.id)}
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
