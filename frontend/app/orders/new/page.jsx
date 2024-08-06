@@ -192,6 +192,7 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
 
 // OrderRow コンポーネント
 function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
+  const [purchaseId, setPurchaseId] = useState(null);
   const inputRef = useRef();
 
   const handleUpdate = (field, value) => {
@@ -206,8 +207,9 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
     handleUpdate("subtotal", calculateSubtotal());
   }, [order.quantity, order.unit_price]);
 
-  const itemSelected = (purchaseId) => {
-    handleUpdate("purchase_id", purchaseId);
+  const itemSelected = (id) => {
+    // handleUpdate("purchase_id", purchaseId);
+    setPurchaseId(id);
   };
 
   return (
