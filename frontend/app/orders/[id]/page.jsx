@@ -9,6 +9,15 @@ export default function OrderDetail() {
   const [order, setOrder] = useState({});
   const [purchases, setPurchases] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
+  useEffect(() => {
+    console.log("mode", searchParams.get("mode"));
+    if (searchParams.get("mode") === "edit") {
+      setIsEditing(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchOrderData() {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 /***********************************************
  * 仕入先情報を取得
@@ -191,33 +192,32 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
 ////////////////////////////////////////////////////////////////////
 
 // OrderRow コンポーネント
-function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
-  const [purchaseId, setPurchaseId] = useState(null);
+function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }) {
+  const [supplierPurchaseId, setSupplierPurchaseId] = useState(null);
   const [selectedItemNumber, setSelectedItemNumber] = useState("");
   const inputRef = useRef();
 
   const handleUpdate = (field, value) => {
+    console.log("field", field, "value", value);
     onUpdate(index, { ...order, [field]: value });
   };
 
   const calculateSubtotal = () => {
-    return order.quantity * order.unit_price;
+    return order.quantity * supplierPurchases[supplierPurchaseId]?.price;
   };
 
   useEffect(() => {
-    handleUpdate("subtotal", calculateSubtotal());
-  }, [order.quantity, order.unit_price]);
+    handleUpdate("subtotal_amount", calculateSubtotal());
+  }, [order.quantity, supplierPurchaseId]);
 
   const itemSelected = (id) => {
-    // handleUpdate("purchase_id", purchaseId);
-    setPurchaseId(id);
-    const itemNumber = purchases.find(
+    setSupplierPurchaseId(id);
+    const itemNumber = supplierPurchases.find(
       (purchase) => purchase.id === id
     ).item_number;
     setSelectedItemNumber(itemNumber ? itemNumber : "none");
-    // const itemNumber = suppliers.find((supplier) => supplier.id === id)
-    //   .supplier_purchases[0].item_number;
-    // setSelectedItemNumber(itemNumber ? itemNumber : "none");
+    handleUpdate("supplier_purchase_id", id);
+    console.log(supplierPurchases[id]);
   };
 
   return (
@@ -225,20 +225,19 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
       <td>
         <div ref={inputRef}>
           <PurchaseName
-            purchases={purchases}
+            purchases={supplierPurchases}
             inputRef={inputRef}
             itemSelected={itemSelected}
           />
         </div>
       </td>
-      <td className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-        {selectedItemNumber}
-        {/* <input
+      <td>
+        <input
           type="text"
           value={selectedItemNumber}
           readOnly
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        /> */}
+        />
       </td>
       <td>
         <input
@@ -251,15 +250,15 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
       <td>
         <input
           type="number"
-          value={order.unit_price}
-          onChange={(e) => handleUpdate("unit_price", e.target.value)}
+          value={supplierPurchases[supplierPurchaseId]?.price}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          readOnly
         />
       </td>
       <td>
         <input
           type="text"
-          value={order.subtotal}
+          value={order.subtotal_amount}
           readOnly
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
         />
@@ -278,9 +277,13 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
 
 // OrderRegistration コンポーネント
 export default function OrderRegistration() {
-  const [orders, setOrders] = useState([]);
+  const [orderDetails, setOrderDetails] = useState([]);
+  // TODO: supplierPurchases, purchasesで名前が混乱しているので整理する
   const [suppliers, setSuppliers] = useState([]);
-  const [purchases, setPurchases] = useState([]);
+  const [selectedSupplierPurchases, setSelectedSupplierPurchases] = useState(
+    []
+  );
+  const [supplierId, setSupplierId] = useState(null);
   const [supplierName, setSupplierName] = useState("");
 
   const [orderDate, setOrderDate] = useState("");
@@ -289,8 +292,9 @@ export default function OrderRegistration() {
   const inputRef = useRef();
 
   const supplierSelected = (id) => {
+    setSupplierId(id);
     setSupplierName(suppliers.find((supplier) => supplier.id === id).name);
-    setPurchases(
+    setSelectedSupplierPurchases(
       suppliers.find((supplier) => supplier.id === id).supplier_purchases
     );
     setOrderDate(
@@ -310,43 +314,77 @@ export default function OrderRegistration() {
   }, []);
 
   const handleAddRow = () => {
-    setOrders([
-      ...orders,
+    setOrderDetails([
+      ...orderDetails,
       {
-        purchase_id: "",
+        supplier_purchase_id: "",
         item_number: "",
+        order_status: 0,
         quantity: 0,
-        unit_price: 0,
-        subtotal: 0,
+        subtotal_amount: 0,
       },
     ]);
   };
 
   const handleUpdateRow = (index, updatedOrder) => {
-    const updatedOrders = orders.map((order, i) =>
+    const updatedOrders = orderDetails.map((order, i) =>
       i === index ? updatedOrder : order
     );
-    setOrders(updatedOrders);
+    setOrderDetails(updatedOrders);
     calculateTotal(updatedOrders);
   };
 
   const handleDeleteRow = (index) => {
-    const updatedOrders = orders.filter((order, i) => i !== index);
-    setOrders(updatedOrders);
+    const updatedOrders = orderDetails.filter((order, i) => i !== index);
+    setOrderDetails(updatedOrders);
     calculateTotal(updatedOrders);
   };
 
   const calculateTotal = (orders) => {
-    const total = orders.reduce((sum, order) => sum + order.subtotal, 0);
+    const total = orders.reduce((sum, order) => sum + order.subtotal_amount, 0);
     setTotalAmount(total);
   };
 
+  /**
+   * POST orders
+   */
+  const saveOrder = async (order) => {
+    const res = await fetch("http://localhost:3000/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+      mode: "cors",
+    });
+    const data = await res.json();
+    // 登録後は詳細画面にリダイレクトする
+    window.location.href = `/orders/${data.id}`;
+  };
+
   const handleSave = () => {
-    // 一時保存のロジックを追加
+    const order = {
+      supplier_id: supplierId,
+      order_status: 0, // 未発注
+      order_date: orderDate, // 発注日目安日（未発注の場合は実際の発注日でないことに注意）
+      total_amount: totalAmount,
+      order_details_attributes: orderDetails,
+    };
+    saveOrder(order);
   };
 
   const handleSubmit = () => {
-    // 発注登録のロジックを追加
+    const order = {
+      supplier_id: supplierId,
+      order_status: 1, // 発注済みに変更
+      order_date: new Date().toISOString().split("T")[0], // 発注日を強制的に今日に設定
+      total_amount: totalAmount,
+      order_details_attributes: orderDetails.map((detail) => ({
+        ...detail,
+        order_status: 1, // 発注済みに変更
+      })),
+    };
+    saveOrder(order);
   };
 
   return (
@@ -397,14 +435,14 @@ export default function OrderRegistration() {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order, index) => (
+            {orderDetails.map((order, index) => (
               <OrderRow
                 key={index}
                 index={index}
                 order={order}
                 onUpdate={handleUpdateRow}
                 onDelete={handleDeleteRow}
-                purchases={purchases}
+                supplierPurchases={selectedSupplierPurchases}
               />
             ))}
           </tbody>
@@ -436,9 +474,11 @@ export default function OrderRegistration() {
           >
             発注登録
           </button>
-          <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
-            戻る
-          </button>
+          <Link href="/orders">
+            <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
+              戻る
+            </button>
+          </Link>
         </div>
       </div>
     </div>
