@@ -11,7 +11,7 @@ class OrdersController < ApplicationController
   # 仕入先の新規登録##########
   def create
     @order = OrderRecord.new(order_params)
-    @order.user_id = 14 # #後でcurrent_userに修正
+    @order.user_id = 1 # #後でcurrent_userに修正
     # binding.irb
 
     if @order.save
