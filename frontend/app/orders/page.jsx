@@ -114,7 +114,11 @@ export default function OrderList() {
           発注日を最近の順にする
         </button>
       </div>
-
+      <Link href="/orders/new">
+        <button className="ml-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700">
+          新規追加
+        </button>
+      </Link>
       <table className="min-w-full bg-white border">
         <thead>
           <tr className="bg-gray-200">
