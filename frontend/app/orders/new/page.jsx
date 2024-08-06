@@ -106,7 +106,7 @@ function SupplierName({ suppliers, inputRef, supplierSelected }) {
 
 function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
   const filteredPurchases = purchases.filter((purchase) =>
-    purchase.name.includes(searchTerm)
+    purchase.purchase_name.includes(searchTerm)
   );
 
   return (
@@ -124,7 +124,7 @@ function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
             onSelect(purchase);
           }}
         >
-          {purchase.name}
+          {purchase.purchase_name}
         </li>
       ))}
     </ul>
@@ -192,6 +192,8 @@ function PurchaseName({ purchases, inputRef, isEditing, itemSelected }) {
 
 // OrderRow コンポーネント
 function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
+  const inputRef = useRef();
+
   const handleUpdate = (field, value) => {
     onUpdate(index, { ...order, [field]: value });
   };
@@ -204,24 +206,20 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
     handleUpdate("subtotal", calculateSubtotal());
   }, [order.quantity, order.unit_price]);
 
+  const itemSelected = (purchaseId) => {
+    handleUpdate("purchase_id", purchaseId);
+  };
+
   return (
-    <tr ref={inputRef}>
+    <tr>
       <td>
-        <PurchaseName
-          purchases={purchases}
-          inputRef={inputRef}
-          itemSelected={itemSelected}
-        />
-        {/* <select
-          value={order.purchase_id}
-          onChange={(e) => handleUpdate("purchase_id", e.target.value)}
-        >
-          {purchases.map((purchase) => (
-            <option key={purchase.id} value={purchase.id}>
-              {purchase.name}
-            </option>
-          ))}
-        </select> */}
+        <div ref={inputRef}>
+          <PurchaseName
+            purchases={purchases}
+            inputRef={inputRef}
+            itemSelected={itemSelected}
+          />
+        </div>
       </td>
       <td>
         <input
@@ -281,20 +279,15 @@ export default function OrderRegistration() {
 
   const supplierSelected = (id) => {
     setSupplierName(suppliers.find((supplier) => supplier.id === id).name);
-    setPurchases(suppliers.find((supplier) => supplier.id === id).purchases);
+    setPurchases(
+      suppliers.find((supplier) => supplier.id === id).supplier_purchases
+    );
   };
 
   useEffect(() => {
     async function fetchData() {
       const suppliersData = await fetchSuppliers();
-      // const allPurchases = suppliersData.flatMap((supplier) =>
-      //   supplier.supplier_purchases.map((purchase) => ({
-      //     ...purchase,
-      //     supplier_name: supplier.name,
-      //   }))
-      // );
       setSuppliers(suppliersData);
-      //setPurchases(allPurchases);
     }
 
     fetchData();
@@ -361,7 +354,6 @@ export default function OrderRegistration() {
               inputRef={inputRef}
               supplierSelected={supplierSelected}
             />
-            {/* 仕入先のオプションを追加 */}
           </div>
           <div>
             <label className="block text-sm font-medium">発注日目安日</label>
