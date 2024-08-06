@@ -134,7 +134,7 @@ function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
 /***********************************************
  * 仕入品名の入力フォーム
  ************************************************/
-function PurchaseName({ purchases, inputRef, isEditing, itemSelected }) {
+function PurchaseName({ purchases, inputRef, itemSelected }) {
   const [searchTerm, setSearchTerm] = useState(""); //検索ワード
   const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
 
@@ -168,13 +168,13 @@ function PurchaseName({ purchases, inputRef, isEditing, itemSelected }) {
     <>
       <input
         type="text"
-        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center ${!isEditing ? "bg-gray-200" : ""}`}
+        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center`}
         value={searchTerm}
         onChange={handleInputChange}
         onFocus={() => setShowDropdown(true)}
         required
       />
-      {isEditing && showDropdown && (
+      {showDropdown && (
         <div ref={dropdownRef}>
           <PurchaseNameDropdown
             purchases={purchases}
