@@ -114,22 +114,23 @@ export default function OrderDetail() {
             </tr>
           </thead>
           <tbody>
-            {order.order_details.map((item, index) => (
-              <tr key={item.id}>
-                <td className="py-2 px-4 border-b">
-                  {item.purchase_name || "不明"}
-                </td>
-                <td className="py-2 px-4 border-b">
-                  {purchases[item.supplier_purchase_id]?.item_number || "不明"}
-                </td>
-                <td className="py-2 px-4 border-b">{item.quantity}</td>
-                <td className="py-2 px-4 border-b">
-                  {purchases[item.supplier_purchase_id]?.price || "不明"}
-                </td>
-                <td className="py-2 px-4 border-b">{item.subtotal_amount}</td>
-                <td className="py-2 px-4 border-b">{item.order_status}</td>
-              </tr>
-            ))}
+            { // ここをOrderRowに置き換えちゃう！
+              order.order_details.map((item, index) => (
+                <tr key={item.id}>
+                  <td className="py-2 px-4 border-b">
+                    {item.purchase_name || "不明"}
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {purchases[item.supplier_purchase_id]?.item_number || "不明"}
+                  </td>
+                  <td className="py-2 px-4 border-b">{item.quantity}</td>
+                  <td className="py-2 px-4 border-b">
+                    {purchases[item.supplier_purchase_id]?.price || "不明"}
+                  </td>
+                  <td className="py-2 px-4 border-b">{item.subtotal_amount}</td>
+                  <td className="py-2 px-4 border-b">{item.order_status}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
