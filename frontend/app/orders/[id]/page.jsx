@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function OrderDetail() {
