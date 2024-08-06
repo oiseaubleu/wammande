@@ -193,6 +193,7 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
 // OrderRow コンポーネント
 function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
   const [purchaseId, setPurchaseId] = useState(null);
+  const [selectedItemNumber, setSelectedItemNumber] = useState("");
   const inputRef = useRef();
 
   const handleUpdate = (field, value) => {
@@ -210,6 +211,13 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
   const itemSelected = (id) => {
     // handleUpdate("purchase_id", purchaseId);
     setPurchaseId(id);
+    const itemNumber = purchases.find(
+      (purchase) => purchase.id === id
+    ).item_number;
+    setSelectedItemNumber(itemNumber ? itemNumber : "none");
+    // const itemNumber = suppliers.find((supplier) => supplier.id === id)
+    //   .supplier_purchases[0].item_number;
+    // setSelectedItemNumber(itemNumber ? itemNumber : "none");
   };
 
   return (
@@ -223,13 +231,14 @@ function OrderRow({ index, order, onUpdate, onDelete, purchases }) {
           />
         </div>
       </td>
-      <td>
-        <input
+      <td className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        {selectedItemNumber}
+        {/* <input
           type="text"
-          value={order.item_number}
+          value={selectedItemNumber}
           readOnly
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-        />
+        /> */}
       </td>
       <td>
         <input
@@ -273,7 +282,7 @@ export default function OrderRegistration() {
   const [suppliers, setSuppliers] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [supplierName, setSupplierName] = useState("");
-  const [supplierId, setSupplierId] = useState("");
+
   const [orderDate, setOrderDate] = useState("");
   const [status, setStatus] = useState("未発注");
   const [totalAmount, setTotalAmount] = useState(0);
@@ -410,7 +419,9 @@ export default function OrderRegistration() {
 
       <div className="flex justify-between items-center">
         <div>
-          <span>合計金額: €{totalAmount}</span>
+          <h2 className="text-xl font-semibold mb-2">
+            合計金額: €{totalAmount}
+          </h2>
         </div>
         <div className="flex space-x-2">
           <button
