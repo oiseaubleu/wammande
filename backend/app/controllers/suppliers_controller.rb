@@ -4,7 +4,7 @@ class SuppliersController < ApplicationController
 
   # 仕入先一覧の表示
   def index
-    @suppliers = Supplier.all # ################　SupplierPurchase.all　まってなんでこんなことしてんの？？？？
+    @suppliers = Supplier.all
     render json: @suppliers
   end
 

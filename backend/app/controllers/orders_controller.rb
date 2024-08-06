@@ -21,6 +21,21 @@ class OrdersController < ApplicationController
     end
   end
 
+  # 仕入先一覧の表示()
+  def new
+    render json: Supplier.all.map { |supplier|
+      {
+        **supplier.attributes,
+        supplier_purchases: supplier.supplier_purchases.map do |supplier_purchase|
+          {
+            **supplier_purchase.attributes,
+            purchase_name: supplier_purchase.purchase.name
+          }
+        end
+      }
+    }
+  end
+
   # 仕入先情報更新##########
   def update
     if @order.update(order_params)
@@ -30,8 +45,20 @@ class OrdersController < ApplicationController
     end
   end
 
+  # def show
+  #   render json: @order, include: :order_details
+  # end
   def show
-    render json: @order, include: :order_details
+    render json: {
+      **@order.attributes,
+      supplier_name: @order.supplier.name,
+      order_details: @order.order_details.map do |order_detail|
+        {
+          **order_detail.attributes,
+          purchase_name: order_detail.supplier_purchase.purchase.name
+        }
+      end
+    }
   end
 
   # 仕入先削除
