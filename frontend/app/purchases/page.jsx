@@ -119,7 +119,7 @@ function NewPurchaseForm({ onSave, onCancel }) {
           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
         />
         <label htmlFor="new-checkbox" className="ml-2">
-          食材
+
         </label>
       </td>
       <td>
@@ -271,6 +271,12 @@ export default function Page() {
               </tr>
             </thead>
             <tbody>
+              {isAdding && (
+                <NewPurchaseForm
+                  onSave={handleSaveNewPurchase}
+                  onCancel={handleCancelNewPurchase}
+                />
+              )}
               {purchases.map((purchase) => (
                 <PurchaseRow
                   key={purchase.id}
@@ -279,12 +285,7 @@ export default function Page() {
                   onDelete={handleDelete}
                 />
               ))}
-              {isAdding && (
-                <NewPurchaseForm
-                  onSave={handleSaveNewPurchase}
-                  onCancel={handleCancelNewPurchase}
-                />
-              )}
+
             </tbody>
           </table>
         )}
