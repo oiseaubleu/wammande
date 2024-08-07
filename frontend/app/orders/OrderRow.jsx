@@ -262,7 +262,7 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
       </td>
       <td>
         <button
-          onClick={() => onDelete(index)}
+          onClick={() => isEditing ? handleUpdate("_destroy", true) : onDelete(index)}
           className="bg-red-500 text-white rounded px-4 py-2 hover:bg-red-700"
         >
           削除

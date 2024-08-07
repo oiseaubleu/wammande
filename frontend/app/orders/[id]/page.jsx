@@ -50,8 +50,27 @@ export default function OrderDetail() {
     fetchOrderData();
   }, [id]);
 
-  const handleEdit = () => {
-    console.log("Edit button clicked");
+
+
+  const updateOrder = async () => {
+    const sendOrder = {
+      ...order,
+      order_details_attributes: [...order.order_details]
+    }
+
+    const res = await fetch(`http://localhost:3000/orders/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(sendOrder),
+      mode: "cors",
+    });
+    const date = await res.json();
+
+    // 登録後は詳細画面にリダイレクトする
+    window.location.href = `/orders/${id}`;
+
   };
 
   const handlePDFExport = () => {
@@ -119,6 +138,46 @@ export default function OrderDetail() {
     const total = orders.reduce((sum, order) => sum + order.subtotal_amount, 0);
     setTotalAmount(total);
   };
+
+
+  //すべてtrueのときだけtrue返すので、保存してもいい状態かどうか調べてる
+  const isSafeToSave = order.order_details.every(
+    (order_detail) =>
+      order_detail._destroy || //削除ボタンが押された状態{_destory: true} これから消すレコードについてはバリデーションしない
+      !order_detail.validationErrors ||
+      order_detail.validationErrors.length === 0
+  );
+
+
+  //ボタンの出し分け
+  const saveOrEditButton = isEditing ? (
+    <>
+      <button
+        className={`text-white rounded px-4 py-2
+        ${isSafeToSave ? "bg-blue-500 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"} `}
+        disabled={!isSafeToSave}
+        onClick={() => {
+          setIsEditing(false); /* 本当はここで保存処理 */
+          updateOrder();//
+        }}
+      >
+        更新
+      </button>
+      <button
+        className="bg-blue-700 text-white rounded px-4 py-2 hover:bg-blue-800"
+        onClick={() => addTentativeSupplierPurchase()}
+      >
+        新規追加
+      </button>
+    </>
+  ) : (
+    <button
+      className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
+      onClick={() => setIsEditing(true)}
+    >
+      編集
+    </button>
+  );
 
 
 
@@ -222,12 +281,7 @@ export default function OrderDetail() {
       </div>
 
       <div className="flex justify-between mt-8">
-        <button
-          className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
-          onClick={handleEdit}
-        >
-          編集
-        </button>
+        {saveOrEditButton}
         <Link href={`/orders`}>
           <button className="bg-gray-500 text-white rounded px-4 py-2 hover:bg-gray-700">
             戻る
