@@ -30,7 +30,15 @@ class SuppliersController < ApplicationController
   end
 
   def show
-    render json: @supplier, include: :supplier_purchases
+    render json: {
+      **@supplier.attributes,
+      supplier_purchases: @supplier.supplier_purchases.map do |supplier_purchase|
+        {
+          **supplier_purchase.attributes,
+          purchase_name: supplier_purchase.purchase.name
+        }
+      end
+    }
   end
 
   # 仕入先削除
