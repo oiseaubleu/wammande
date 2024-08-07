@@ -78,8 +78,28 @@ export default function OrderList() {
 
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading...!!</div>;
   }
+
+  const getOrderStatusLabel = (status) => {
+    switch (status) {
+      case "not_ordered":
+        return "未発注";
+      case "ordered_pending_delivery":
+        return "納品待ち";
+      case "order_cancelled":
+        return "発注キャンセル";
+      case "delivered":
+        return "納品済";
+      case "delivery_cancelled":
+        return "納品キャンセル";
+      default:
+        return status;
+    }
+  };
+
+
+
 
   return (
     <div className="p-8">
@@ -157,7 +177,7 @@ export default function OrderList() {
               <td className="py-2 px-4 border-b">
                 {suppliers[order.supplier_id]?.name || "不明"}
               </td>
-              <td className="py-2 px-4 border-b">{order.order_status}</td>
+              <td className="py-2 px-4 border-b">{getOrderStatusLabel(order.order_status)}</td>
               <td className="py-2 px-4 border-b">€{order.total_amount}</td>
               <td className="py-2 px-4 border-b">
                 <Link href={`/orders/${order.id}`}>

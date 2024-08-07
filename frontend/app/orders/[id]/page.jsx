@@ -184,7 +184,7 @@ export default function OrderDetail() {
       case "not_ordered":
         return "未発注";
       case "ordered_pending_delivery":
-        return "発注済（納品待ち）";
+        return "納品待ち";
       case "order_cancelled":
         return "発注キャンセル";
       case "delivered":
