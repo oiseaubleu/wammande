@@ -73,7 +73,7 @@ export default function OrderDetail() {
           ...order.order_details,
           {
             // TODO: 仮のid要素を追加しておく。じゃないと、後々 `handleUpdateRow` とかできない
-            supplier_purchase_id: "",
+            supplier_purchase_id: `tmp-${Math.random().toString(32).substring(2)}`,
             item_number: "",
             order_status: 0,
             quantity: 0,

@@ -89,9 +89,13 @@ function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
 }
 /***********************************************
  * 仕入品名の入力フォーム
+ * 
+ * purchases ... supplierPurchasesの配列
+ * inputRef ... 親要素のRef。割とどうでもいい
+ * itemSelected ... ドロップダウンからアイテムを選択したときに動く関数。引数は supplier_purchase_id 
  ************************************************/
-function PurchaseName({ purchases, inputRef, itemSelected }) {
-  const [searchTerm, setSearchTerm] = useState(""); //検索ワード
+function PurchaseName({ purchases, inputRef, itemSelected, initialSearchTerm }) {
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm || ""); //検索ワード
   const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
 
 
@@ -153,9 +157,9 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
  * supplierPurchases ... orderDetail.supplier_id の仕入れ先の持っている仕入れ品すべて。配列
  */
 export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurchases }) {
-  const [supplierPurchaseId, setSupplierPurchaseId] = useState(null);
-  const [price, setPrice] = useState(0);
-  const [selectedItemNumber, setSelectedItemNumber] = useState("");
+  const [supplierPurchaseId, setSupplierPurchaseId] = useState(orderDetail.supplier_purchase_id);
+  const [price, setPrice] = useState(supplierPurchases.find((sp) => sp.id === orderDetail.supplier_purchase_id)?.price);
+  const [selectedItemNumber, setSelectedItemNumber] = useState(supplierPurchases.find((sp) => sp.id === orderDetail.supplier_purchase_id)?.item_number);
   const inputRef = useRef();
 
   const handleUpdate = (field, value) => {
@@ -188,6 +192,10 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
     console.log(id, supplierPurchases[id], supplierPurchases);
   };
 
+
+
+
+
   return (
     <tr>
       <td>
@@ -195,7 +203,9 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
           <PurchaseName
             purchases={supplierPurchases}
             inputRef={inputRef}
-            itemSelected={itemSelected} />
+            itemSelected={itemSelected}
+            initialSearchTerm={orderDetail.purchase_name}
+          />
         </div>
       </td>
       <td>
