@@ -179,7 +179,22 @@ export default function OrderDetail() {
     </button>
   );
 
-
+  const getOrderStatusLabel = (status) => {
+    switch (status) {
+      case "not_ordered":
+        return "未発注";
+      case "ordered_pending_delivery":
+        return "発注済（納品待ち）";
+      case "order_cancelled":
+        return "発注キャンセル";
+      case "delivered":
+        return "納品済";
+      case "delivery_cancelled":
+        return "納品キャンセル";
+      default:
+        return status;
+    }
+  };
 
   return (
     <div className="p-8">
@@ -191,7 +206,7 @@ export default function OrderDetail() {
         <label className="block text-sm font-medium">ステータス</label>
         <div className="flex items-center">
           <span className="bg-yellow-300 p-2 rounded mr-2">
-            {order.order_status}
+            {getOrderStatusLabel(order.order_status)}
           </span>
         </div>
       </div>
@@ -213,7 +228,7 @@ export default function OrderDetail() {
             <input
               type="text"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              value={order.order_date}
+              value={order.order_date.split("T")[0]}
               readOnly
             />
           </div>

@@ -153,7 +153,7 @@ export default function OrderList() {
         <tbody>
           {orders.map((order) => (
             <tr key={order.id}>
-              <td className="py-2 px-4 border-b">{order.order_date}</td>
+              <td className="py-2 px-4 border-b">{order.order_date.split("T")[0]}</td>
               <td className="py-2 px-4 border-b">
                 {suppliers[order.supplier_id]?.name || "不明"}
               </td>
