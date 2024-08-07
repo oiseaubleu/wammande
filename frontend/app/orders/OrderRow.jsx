@@ -240,11 +240,25 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
       </td>
       <td>
-        <input
+        <select
+          className="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          value={orderDetail?.order_status}
+          onChange={(e) => handleUpdate("order_status", e.target.value)}
+          disabled={!isEditing}
+        >
+          <option value="not_ordered">未発注</option>
+          <option value="ordered_pending_delivery">発注済（納品待ち）</option>
+          <option value="order_cancelled">発注キャンセル</option>
+          <option value="delivered">納品済</option>
+          <option value="delivery_cancelled">納品キャンセル</option>
+        </select>
+
+
+        {/* <input
           type="text"
           value={orderDetail?.order_status}
           readOnly={!isEditing}
-          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" /> */}
       </td>
       <td>
         <button
