@@ -12,6 +12,8 @@ export default function OrderList() {
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+
+
   //ordersのデータを取得
   useEffect(() => {
     async function fetchOrderData() {
@@ -25,6 +27,7 @@ export default function OrderList() {
     }
     fetchOrderData();
   }, []);
+
 
   useEffect(() => {
     async function fetchSupplierData() {
@@ -44,6 +47,9 @@ export default function OrderList() {
     fetchSupplierData();
   }, []);
 
+
+
+
   const handleSearch = () => {
     // 検索ロジックを追加します。
     console.log("Search clicked");
@@ -55,6 +61,21 @@ export default function OrderList() {
     );
     setOrders(sortedOrders);
   };
+
+
+  const handleDelete = (id) => {
+    async function deleteData(id) {
+      const res = await fetch(`http://localhost:3000/orders/${id}`, {
+        method: "DELETE",
+        mode: "cors",
+      });
+      setOrders(orders.filter((order) => order.id !== id));
+    }
+    if (confirm("この発注情報を本当に削除しますか?")) {
+      deleteData(id);
+    }
+  };
+
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -73,7 +94,7 @@ export default function OrderList() {
             <input
               type="text"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              // value={supplierName}
+            // value={supplierName}
             />
           </div>
           <div>
@@ -82,7 +103,7 @@ export default function OrderList() {
               type="text"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               value={itemName}
-              // onChange={(e) => setItemName(e.target.value)}
+            // onChange={(e) => setItemName(e.target.value)}
             />
           </div>
           <div>
@@ -90,7 +111,7 @@ export default function OrderList() {
             <select
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               value={status}
-              // onChange={(e) => setStatus(e.target.value)}
+            // onChange={(e) => setStatus(e.target.value)}
             >
               <option value="">全て</option>
               <option value="納品待ち">納品待ち</option>
@@ -140,10 +161,23 @@ export default function OrderList() {
               <td className="py-2 px-4 border-b">€{order.total_amount}</td>
               <td className="py-2 px-4 border-b">
                 <Link href={`/orders/${order.id}`}>
-                  <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                  <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-blue-700">
                     詳細
                   </button>
                 </Link>
+                <Link href={`/orders/${order.id}?mode=edit`}>
+                  <button
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                  >
+                    編集
+                  </button>
+                </Link>
+                <button
+                  onClick={() => handleDelete(order.id)}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+                >
+                  削除
+                </button>
               </td>
             </tr>
           ))}
