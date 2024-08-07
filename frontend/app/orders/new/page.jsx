@@ -205,11 +205,11 @@ export default function OrderRegistration() {
             </tr>
           </thead>
           <tbody>
-            {orderDetails.map((order, index) => (
+            {orderDetails.map((orderDetail, index) => (
               <OrderRow
                 key={index}
                 index={index}
-                order={order}
+                orderDetail={orderDetail}
                 onUpdate={handleUpdateRow}
                 onDelete={handleDeleteRow}
                 supplierPurchases={selectedSupplierPurchases}

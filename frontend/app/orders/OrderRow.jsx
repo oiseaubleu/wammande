@@ -142,9 +142,17 @@ function PurchaseName({ purchases, inputRef, itemSelected }) {
     </>
   );
 }
-////////////////////////////////////////////////////////////////////
-// OrderRow コンポーネント
-export function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }) {
+
+/**
+ * OrderRow ... OrderDetailの１行分を表すコンポーネント
+ * 
+ * index ... OrderDetail自体のID
+ * orderDetail ... order.order_detailsの中の１レコード分。元の order はこのコンポーネントを呼び出す親側で管理されている
+ * onUpdate ... このorderDetailに変更があった場合に、もとのorder.order_detailsを更新する
+ * onDelete ... このorderDetailが削除された場合に、もとのorder.order_detailsから削除（もしくは更新）する
+ * supplierPurchases ... orderDetail.supplier_id の仕入れ先の持っている仕入れ品すべて。配列
+ */
+export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurchases }) {
   const [supplierPurchaseId, setSupplierPurchaseId] = useState(null);
   const [price, setPrice] = useState(0);
   const [selectedItemNumber, setSelectedItemNumber] = useState("");
@@ -152,16 +160,20 @@ export function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }
 
   const handleUpdate = (field, value) => {
     console.log("field", field, "value", value);
-    onUpdate(index, { ...order, [field]: value });
+    onUpdate(index, { ...orderDetail, [field]: value });
   };
 
   const calculateSubtotal = () => {
-    return order.quantity * supplierPurchases[supplierPurchaseId]?.price;
+    const targetSupplierPurchase = supplierPurchases.find(
+      (supplierPurchase) => supplierPurchase.id === orderDetail.supplier_purchase_id
+    );
+    console.log(targetSupplierPurchase);
+    return orderDetail.quantity * price;
   };
 
   useEffect(() => {
     handleUpdate("subtotal_amount", calculateSubtotal());
-  }, [order.quantity, supplierPurchaseId]);
+  }, [orderDetail?.quantity, supplierPurchaseId]);
 
   const itemSelected = (id) => {
     setSupplierPurchaseId(id);
@@ -196,7 +208,7 @@ export function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }
       <td>
         <input
           type="number"
-          value={order.quantity}
+          value={orderDetail?.quantity}
           onChange={(e) => handleUpdate("quantity", e.target.value)}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
       </td>
@@ -210,7 +222,7 @@ export function OrderRow({ index, order, onUpdate, onDelete, supplierPurchases }
       <td>
         <input
           type="text"
-          value={order.subtotal_amount}
+          value={orderDetail?.subtotal_amount}
           readOnly
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
       </td>

@@ -3,13 +3,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { SupplierName, OrderRow } from "../OrderRow";
 
 export default function OrderDetail() {
   const { id } = useParams();
   const [order, setOrder] = useState({});
-  const [purchases, setPurchases] = useState({});
+  const [purchases, setPurchases] = useState({});//発注先の仕入れ品情報すべて
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
   useEffect(() => {
@@ -20,34 +22,33 @@ export default function OrderDetail() {
   }, [searchParams]);
 
   useEffect(() => {
+    /**
+     * 特定のorderに対する情報をとってくる。
+     * 1. まずはURLに含まれるIDをもとに、 /orders/${id} でorder全体のJSONをとってくる
+     *     このとき、まだsetOrdeR(order)はしない。依存している supplierPurchases の情報がまだないので。
+     * 2. そのあと、orderに紐づくSupplierの情報を丸っととってきて、その中のsupplier_purchasesを保存する
+     * 3. ここまで保存して初めて、setOrder(order)する
+     *    →ここでorderのstateが変化したので、下のほうにある order.order_details.map... の処理が動いて各行が描画される
+     */
     async function fetchOrderData() {
-      const res = await fetch(`http://localhost:3000/orders/${id}`, {
+      const orderRes = await fetch(`http://localhost:3000/orders/${id}`, {
         mode: "cors",
       });
-      const data = await res.json();
-      console.log(data);
-      setOrder(data);
+      const order = await orderRes.json();
+      console.log(order);
+
+      const supplierPurchasesRes = await fetch(`http://localhost:3000/suppliers/${order.supplier_id}`, {
+        mode: "cors",
+      });
+      const supplier = await supplierPurchasesRes.json();
+      console.log(supplier);
+
+      setPurchases(supplier.supplier_purchases);
+      setOrder(order);
       setIsLoading(false);
     }
     fetchOrderData();
   }, [id]);
-
-  useEffect(() => {
-    async function fetchPurchaseData() {
-      const res = await fetch(`http://localhost:3000/suppliers/${order.supplier_id}`, {
-        mode: "cors",
-      });
-      const supplier = await res.json();
-      console.log(supplier);
-      setPurchases(
-        supplier.supplier_purchases.reduce(
-          (obj, item) => ((obj[item.id] = { ...item }), obj),
-          {}
-        )
-      );
-    }
-    fetchPurchaseData();
-  }, [order.supplier_id]);
 
   const handleEdit = () => {
     console.log("Edit button clicked");
@@ -60,6 +61,66 @@ export default function OrderDetail() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+
+  //追加ボタンを押したときに新規の行がでてくる
+  //
+  const handleAddRow = () => {
+    setOrder(
+      {
+        ...order,
+        order_details: [
+          ...order.order_details,
+          {
+            // TODO: 仮のid要素を追加しておく。じゃないと、後々 `handleUpdateRow` とかできない
+            supplier_purchase_id: "",
+            item_number: "",
+            order_status: 0,
+            quantity: 0,
+            subtotal_amount: 0,
+          }]
+      });
+  };
+
+  //フォームを編集したときにstateに保存する
+  //具体的には、order_detailsの中身をみて更新があったidだけ上書きしたい
+  //index:更新があったorder_detailのid
+  //updateOrder：その内容
+  const handleUpdateRow = (index, updatedOrderDetail) => {
+    const updatedOrderDetails = order.order_details.map((order_detail) =>
+      order_detail.id === index ? updatedOrderDetail : order_detail
+    );
+    setOrder(
+      {
+        ...order,
+        order_details:
+          updatedOrderDetails
+
+      }
+    );
+    calculateTotal(updatedOrderDetails);
+  };
+
+  //フォーム内容を削除したとき
+  const handleDeleteRow = (index) => {
+    // TODO: 編集画面では、order_detailsから消すのではなくて、 `_destroy: true` を足す必要がある
+    const updatedOrderDetails = order.order_details.filter((order_detail) => order_detail.id !== index);
+    setOrder(
+      {
+        ...order,
+        order_details:
+          updatedOrderDetails
+      }
+    );
+    calculateTotal(updatedOrderDetails);
+  };
+
+  const calculateTotal = (orders) => {
+    const total = orders.reduce((sum, order) => sum + order.subtotal_amount, 0);
+    setTotalAmount(total);
+  };
+
+
 
   return (
     <div className="p-8">
@@ -114,7 +175,19 @@ export default function OrderDetail() {
             </tr>
           </thead>
           <tbody>
-            { // ここをOrderRowに置き換えちゃう！
+            {/* TODO: 1. order.order_details の要素1個ずつに対してmapする */}
+            {order.order_details.map((orderDetail, index) => (
+              <OrderRow
+                key={orderDetail.id}
+                index={orderDetail.id}
+                orderDetail={orderDetail}
+                onUpdate={handleUpdateRow}
+                onDelete={handleDeleteRow}
+                supplierPurchases={purchases} />
+            )
+            )}
+
+            {/* { // ここをOrderRowに置き換えちゃう！
               order.order_details.map((item, index) => (
                 <tr key={item.id}>
                   <td className="py-2 px-4 border-b">
@@ -130,7 +203,7 @@ export default function OrderDetail() {
                   <td className="py-2 px-4 border-b">{item.subtotal_amount}</td>
                   <td className="py-2 px-4 border-b">{item.order_status}</td>
                 </tr>
-              ))}
+              ))} */}
           </tbody>
         </table>
       </div>
