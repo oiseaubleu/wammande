@@ -77,7 +77,7 @@ class OrdersController < ApplicationController
   def order_params
     params.require(:order).permit(
       :supplier_id, :order_status, :order_date, :delivery_date, :total_amount,
-      order_details_attributes: %i[supplier_purchase_id quantity comment subtotal_amount order_status _destroy]
+      order_details_attributes: %i[id supplier_purchase_id quantity comment subtotal_amount order_status _destroy]
     )
   end
 end
