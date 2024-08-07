@@ -183,7 +183,8 @@ export default function OrderDetail() {
                 orderDetail={orderDetail}
                 onUpdate={handleUpdateRow}
                 onDelete={handleDeleteRow}
-                supplierPurchases={purchases} />
+                supplierPurchases={purchases}
+                isEditing={isEditing} />
             )
             )}
 

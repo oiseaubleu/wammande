@@ -147,6 +147,8 @@ function PurchaseName({ purchases, inputRef, itemSelected, initialSearchTerm }) 
   );
 }
 
+
+
 /**
  * OrderRow ... OrderDetailの１行分を表すコンポーネント
  * 
@@ -156,7 +158,7 @@ function PurchaseName({ purchases, inputRef, itemSelected, initialSearchTerm }) 
  * onDelete ... このorderDetailが削除された場合に、もとのorder.order_detailsから削除（もしくは更新）する
  * supplierPurchases ... orderDetail.supplier_id の仕入れ先の持っている仕入れ品すべて。配列
  */
-export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurchases }) {
+export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurchases, isEditing }) {
   const [supplierPurchaseId, setSupplierPurchaseId] = useState(orderDetail.supplier_purchase_id);
   const [price, setPrice] = useState(supplierPurchases.find((sp) => sp.id === orderDetail.supplier_purchase_id)?.price);
   const [selectedItemNumber, setSelectedItemNumber] = useState(supplierPurchases.find((sp) => sp.id === orderDetail.supplier_purchase_id)?.item_number);
@@ -219,6 +221,7 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
         <input
           type="number"
           value={orderDetail?.quantity}
+          readOnly={!isEditing}
           onChange={(e) => handleUpdate("quantity", e.target.value)}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
       </td>
@@ -234,6 +237,13 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
           type="text"
           value={orderDetail?.subtotal_amount}
           readOnly
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+      </td>
+      <td>
+        <input
+          type="text"
+          value={orderDetail?.order_status}
+          readOnly={!isEditing}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
       </td>
       <td>

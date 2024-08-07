@@ -213,6 +213,7 @@ export default function OrderRegistration() {
                 onUpdate={handleUpdateRow}
                 onDelete={handleDeleteRow}
                 supplierPurchases={selectedSupplierPurchases}
+                isEditing={true}
               />
             ))}
           </tbody>
