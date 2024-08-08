@@ -113,17 +113,13 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
     onUpdate(index, updatedOrderDetail);
   };
 
-  const calculateSubtotal = () => {
-    const targetSupplierPurchase = supplierPurchases.find(
-      (supplierPurchase) => supplierPurchase.id === orderDetail.supplier_purchase_id
-    );
-    console.log(targetSupplierPurchase);
-    return orderDetail.quantity * price;
-  };
-
-  useEffect(() => {
-    handleUpdate("subtotal_amount", calculateSubtotal());
-  }, [orderDetail?.quantity, supplierPurchaseId]);
+  const handleQuantityChange = (quantity) => {
+    onUpdate(index, {
+      ...orderDetail,
+      quantity,
+      subtotal_amount: quantity * price,
+    });
+  }
 
   /**
    * プルダウンでSupplierPurchaseのアイテムが選択されたときに動く処理
@@ -141,7 +137,12 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
     setSelectedItemNumber(itemNumber ? itemNumber : "none");
     setPrice(targetSupplierPurchase.price);
 
-    onUpdate(index, { ...orderDetail, supplier_purchase_id: id, item_number: itemNumber });
+    onUpdate(index, {
+      ...orderDetail,
+      supplier_purchase_id: id,
+      item_number: itemNumber,
+      subtotal_amount: orderDetail.quantity * targetSupplierPurchase.price,
+    });
     console.log(id, supplierPurchases[id], supplierPurchases);
   };
 
@@ -173,7 +174,7 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
           type="number"
           value={orderDetail?.quantity}
           readOnly={!isEditing}
-          onChange={(e) => handleUpdate("quantity", e.target.value)}
+          onChange={(e) => handleQuantityChange(e.target.value)}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
       </td>
       <td>

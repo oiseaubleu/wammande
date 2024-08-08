@@ -11,7 +11,6 @@ export default function OrderDetail() {
   const [purchases, setPurchases] = useState({});//発注先の仕入れ品情報すべて
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [totalAmount, setTotalAmount] = useState(0);
 
   const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
   useEffect(() => {
@@ -125,18 +124,16 @@ export default function OrderDetail() {
   //index:更新があったorder_detailのid
   //updateOrder：その内容
   const handleUpdateRow = (index, updatedOrderDetail) => {
-    console.log("update at page", index, updatedOrderDetail);
     const updatedOrderDetails = order.order_details.map((order_detail) =>
       order_detail.id === index ? updatedOrderDetail : order_detail
     );
-    console.log("updatedOrderDetails", updatedOrderDetails);
     setOrder(
       {
         ...order,
+        total_amount: calculateTotal(updatedOrderDetails),
         order_details: updatedOrderDetails
       }
     );
-    calculateTotal(updatedOrderDetails);
   };
 
   /**
@@ -160,15 +157,14 @@ export default function OrderDetail() {
     setOrder(
       {
         ...order,
+        total_amount: calculateTotal(updatedOrderDetails),
         order_details: updatedOrderDetails
       }
     );
-    calculateTotal(updatedOrderDetails);
   };
 
   const calculateTotal = (orders) => {
-    const total = orders.reduce((sum, order) => sum + order.subtotal_amount, 0);
-    setTotalAmount(total);
+    return orders.reduce((sum, order) => sum + Number(order.subtotal_amount), 0);
   };
 
 
@@ -195,23 +191,25 @@ export default function OrderDetail() {
         {order.order_status === "not_ordered" ? `一時保存` : `更新`}
       </button>
       {
-        order.order_status === "not_orderd" && (
-          <button
-            onClick={() => {
-              setIsEditing(false);
-              updateOrder({ willRegisterPurchase: true });
-            }}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
-          >
-            発注登録
-          </button>
+        order.order_status === "not_ordered" && (
+          <>
+            <button
+              onClick={() => {
+                setIsEditing(false);
+                updateOrder({ willRegisterPurchase: true });
+              }}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+            >
+              発注登録
+            </button>
+            <button
+              className="bg-blue-700 text-white rounded px-4 py-2 hover:bg-blue-800"
+              onClick={() => handleAddRow()}
+            >
+              新規追加
+            </button>
+          </>
         )}
-      <button
-        className="bg-blue-700 text-white rounded px-4 py-2 hover:bg-blue-800"
-        onClick={() => handleAddRow()}
-      >
-        新規追加
-      </button>
     </>
   ) : (
     <button
