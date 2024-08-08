@@ -13,7 +13,7 @@ const ToDoList = ({ todos, onRegister }) => (
         <tr>
           <th className="py-2 px-4 border-b">仕入先</th>
           <th className="py-2 px-4 border-b">次回発注予定日</th>
-          <th className="py-2 px-4 border-b">購入品目</th>
+
           <th className="py-2 px-4 border-b">ステータス</th>
           <th className="py-2 px-4 border-b"></th>
         </tr>
@@ -21,11 +21,11 @@ const ToDoList = ({ todos, onRegister }) => (
       <tbody>
         {todos.map((todo, index) => (
           <tr key={index}>
-            <td className="py-2 px-4 border-b">{todo.supplier}</td>
-            <td className="py-2 px-4 border-b">{todo.nextOrderDate}</td>
-            <td className="py-2 px-4 border-b">{todo.item}</td>
-            <td className="py-2 px-4 border-b">{todo.status}</td>
-            <td className="py-2 px-4 border-b">
+            <td className="py-2 px-4 border-b  text-center">{todo.supplier}</td>
+            <td className="py-2 px-4 border-b  text-center">{todo.nextOrderDate}</td>
+
+            <td className="py-2 px-4 border-b  text-center">{todo.status}</td>
+            <td className="py-2 px-4 border-b  text-center">
               <button
                 className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
                 onClick={() => onRegister(todo)}
@@ -49,7 +49,7 @@ const PendingList = ({ pendings, onEdit }) => (
         <tr>
           <th className="py-2 px-4 border-b">仕入先</th>
           <th className="py-2 px-4 border-b">次回発注予定日</th>
-          <th className="py-2 px-4 border-b">購入品目</th>
+
           <th className="py-2 px-4 border-b">ステータス</th>
           <th className="py-2 px-4 border-b"></th>
         </tr>
@@ -57,11 +57,11 @@ const PendingList = ({ pendings, onEdit }) => (
       <tbody>
         {pendings.map((pending, index) => (
           <tr key={index}>
-            <td className="py-2 px-4 border-b">{pending.supplier}</td>
-            <td className="py-2 px-4 border-b">{pending.nextOrderDate}</td>
-            <td className="py-2 px-4 border-b">{pending.item}</td>
-            <td className="py-2 px-4 border-b">{pending.status}</td>
-            <td className="py-2 px-4 border-b">
+            <td className="py-2 px-4 border-b  text-center">{pending.supplier}</td>
+            <td className="py-2 px-4 border-b  text-center">{pending.nextOrderDate}</td>
+
+            <td className="py-2 px-4 border-b  text-center">{pending.status}</td>
+            <td className="py-2 px-4 border-b  text-center">
               <button
                 className="bg-gray-500 text-white rounded px-4 py-2 hover:bg-gray-700"
                 onClick={() => onEdit(pending)}
@@ -80,12 +80,12 @@ const PendingList = ({ pendings, onEdit }) => (
 const App = () => {
   const [budget, setBudget] = useState(3000);
   const [todos, setTodos] = useState([
-    { supplier: 'モノプリ', nextOrderDate: '2024/09/15', item: 'オクラ, エリンギ, シメジ, タイモ', status: '未発注' },
-    { supplier: '肉屋', nextOrderDate: '2024/09/25', item: '豚肩肉', status: '未発注' },
-    { supplier: '魚屋', nextOrderDate: '2024/09/30', item: 'タラ', status: '未発注' }
+    { supplier: 'モノプリ', nextOrderDate: '2024/09/15', status: '未発注' },
+    { supplier: '肉屋', nextOrderDate: '2024/09/25', status: '未発注' },
+    { supplier: '魚屋', nextOrderDate: '2024/09/30', status: '未発注' }
   ]);
   const [pendings, setPendings] = useState([
-    { supplier: 'モノプリ', nextOrderDate: '2024/09/15', item: 'シメジ, シンガイモ', status: '納品待ち' }
+    { supplier: 'モノプリ', nextOrderDate: '2024/09/15', status: '納品待ち' }
   ]);
 
   const handleRegister = (todo) => {
