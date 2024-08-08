@@ -63,7 +63,8 @@ export function SupplierName({ suppliers, inputRef, supplierSelected }) {
  * 仕入品名のドロップダウンメニュー
  ************************************************/
 function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
-  const filteredPurchases = purchases.filter((purchase) => purchase.purchase_name.includes(searchTerm)
+  const filteredSupplierPurchases = purchases.filter(
+    (supplierPurchase) => supplierPurchase.purchase_name.includes(searchTerm)
   );
 
   return (
@@ -73,15 +74,15 @@ function PurchaseNameDropdown({ purchases, searchTerm, onSelect, parentRef }) {
         width: parentRef.current ? parentRef.current.offsetWidth : "100%",
       }}
     >
-      {filteredPurchases.map((purchase) => (
+      {filteredSupplierPurchases.map((supplierPurchase) => (
         <li
-          key={purchase.id}
+          key={supplierPurchase.id}
           className="px-4 py-2 hover:bg-indigo-200 cursor-pointer"
           onMouseDown={() => {
-            onSelect(purchase);
+            onSelect(supplierPurchase);
           }}
         >
-          {purchase.purchase_name}
+          {supplierPurchase.purchase_name}
         </li>
       ))}
     </ul>
@@ -119,10 +120,10 @@ function PurchaseName({ purchases, inputRef, itemSelected, initialSearchTerm }) 
     }
   };
   //選択されたら、検索ワードを更新して、ドロップダウンメニューを閉じる
-  const handleItemSelected = (purchase) => {
-    setSearchTerm(purchase.purchase_name);
+  const handleItemSelected = (supplierPurchase) => {
+    setSearchTerm(supplierPurchase.purchase_name);
     setShowDropdown(false);
-    itemSelected(purchase.id);
+    itemSelected(supplierPurchase.id);
   };
 
   return (
@@ -165,8 +166,9 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
   const inputRef = useRef();
 
   const handleUpdate = (field, value) => {
-    console.log("field", field, "value", value);
-    onUpdate(index, { ...orderDetail, [field]: value });
+    const updatedOrderDetail = { ...orderDetail, [field]: value };
+    console.log("field", field, "value", value, "updatedOrderDetail", updatedOrderDetail);
+    onUpdate(index, updatedOrderDetail);
   };
 
   const calculateSubtotal = () => {
@@ -181,6 +183,13 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
     handleUpdate("subtotal_amount", calculateSubtotal());
   }, [orderDetail?.quantity, supplierPurchaseId]);
 
+  /**
+   * プルダウンでSupplierPurchaseのアイテムが選択されたときに動く処理
+   * - 自分自信が持っている画面表示用のState (supplierPurchaseId, selectedItemNumber, price) を更新
+   * - 親コンポーネントで管理されているorderDetailを更新
+   * 
+   * @param {number} id supplierPurchaseのID
+   */
   const itemSelected = (id) => {
     setSupplierPurchaseId(id);
     const targetSupplierPurchase = supplierPurchases.find(
@@ -190,7 +199,7 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
     setSelectedItemNumber(itemNumber ? itemNumber : "none");
     setPrice(targetSupplierPurchase.price);
 
-    handleUpdate("supplier_purchase_id", id);
+    onUpdate(index, { ...orderDetail, supplier_purchase_id: id, item_number: itemNumber });
     console.log(id, supplierPurchases[id], supplierPurchases);
   };
 
@@ -262,8 +271,9 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
       </td>
       <td>
         <button
-          onClick={() => isEditing ? handleUpdate("_destroy", true) : onDelete(index)}
-          className="bg-red-500 text-white rounded px-4 py-2 hover:bg-red-700"
+          onClick={() => onDelete(index)}
+          className={`text-white rounded px-4 py-2 ${isEditing ? "bg-red-500 hover:bg-red-700" : "bg-gray-300 cursor-not-allowed"}`}
+          disabled={!isEditing}
         >
           削除
         </button>

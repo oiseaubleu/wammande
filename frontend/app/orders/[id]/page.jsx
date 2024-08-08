@@ -92,7 +92,8 @@ export default function OrderDetail() {
           ...order.order_details,
           {
             // TODO: 仮のid要素を追加しておく。じゃないと、後々 `handleUpdateRow` とかできない
-            supplier_purchase_id: `tmp-${Math.random().toString(32).substring(2)}`,
+            id: `tmp-${Math.random().toString(32).substring(2)}`,
+            supplier_purchase_id: "", // 仕入れ品を選択するまでわからないので空にしておく
             item_number: "",
             order_status: 0,
             quantity: 0,
@@ -106,29 +107,42 @@ export default function OrderDetail() {
   //index:更新があったorder_detailのid
   //updateOrder：その内容
   const handleUpdateRow = (index, updatedOrderDetail) => {
+    console.log("update at page", index, updatedOrderDetail);
     const updatedOrderDetails = order.order_details.map((order_detail) =>
       order_detail.id === index ? updatedOrderDetail : order_detail
     );
+    console.log("updatedOrderDetails", updatedOrderDetails);
     setOrder(
       {
         ...order,
-        order_details:
-          updatedOrderDetails
-
+        order_details: updatedOrderDetails
       }
     );
     calculateTotal(updatedOrderDetails);
   };
 
-  //フォーム内容を削除したとき
+  /**
+   * 各行の削除ボタンが押されたときの動きを司る関数
+   * 
+   * @param {number | string} index orderDetailのID。新規追加の場合は `tmp-xxxx` という文字列
+   */
   const handleDeleteRow = (index) => {
+    console.log("delete", index);
     // TODO: 編集画面では、order_detailsから消すのではなくて、 `_destroy: true` を足す必要がある
-    const updatedOrderDetails = order.order_details.filter((order_detail) => order_detail.id !== index);
+    let updatedOrderDetails;
+    if (String(index).match(/^tmp-/)) {
+      // 新規追加してすぐの行は、そのまま削除してしまってOK
+      updatedOrderDetails = order.order_details.filter((order_detail) => order_detail.id !== index);
+    } else {
+      // 既存の行は、_destroy: true を追加しておく
+      updatedOrderDetails = order.order_details.map((order_detail) =>
+        order_detail.id === index ? { ...order_detail, _destroy: true } : order_detail
+      );
+    }
     setOrder(
       {
         ...order,
-        order_details:
-          updatedOrderDetails
+        order_details: updatedOrderDetails
       }
     );
     calculateTotal(updatedOrderDetails);
@@ -165,7 +179,7 @@ export default function OrderDetail() {
       </button>
       <button
         className="bg-blue-700 text-white rounded px-4 py-2 hover:bg-blue-800"
-        onClick={() => addTentativeSupplierPurchase()}
+        onClick={() => handleAddRow()}
       >
         新規追加
       </button>
@@ -249,36 +263,20 @@ export default function OrderDetail() {
             </tr>
           </thead>
           <tbody>
-            {/* TODO: 1. order.order_details の要素1個ずつに対してmapする */}
-            {order.order_details.map((orderDetail, index) => (
-              <OrderRow
-                key={orderDetail.id}
-                index={orderDetail.id}
-                orderDetail={orderDetail}
-                onUpdate={handleUpdateRow}
-                onDelete={handleDeleteRow}
-                supplierPurchases={purchases}
-                isEditing={isEditing} />
-            )
-            )}
+            {/* 既存レコードで削除されたもの＝_destroy: true があるものは除外する */
+              order.order_details.filter((orderDetail) => !orderDetail._destroy).map((orderDetail, index) => (
+                <OrderRow
+                  key={orderDetail.id}
+                  index={orderDetail.id}
+                  orderDetail={orderDetail}
+                  onUpdate={handleUpdateRow}
+                  onDelete={handleDeleteRow}
+                  supplierPurchases={purchases}
+                  isEditing={isEditing} />
+              )
+              )}
 
-            {/* { // ここをOrderRowに置き換えちゃう！
-              order.order_details.map((item, index) => (
-                <tr key={item.id}>
-                  <td className="py-2 px-4 border-b">
-                    {item.purchase_name || "不明"}
-                  </td>
-                  <td className="py-2 px-4 border-b">
-                    {purchases[item.supplier_purchase_id]?.item_number || "不明"}
-                  </td>
-                  <td className="py-2 px-4 border-b">{item.quantity}</td>
-                  <td className="py-2 px-4 border-b">
-                    {purchases[item.supplier_purchase_id]?.price || "不明"}
-                  </td>
-                  <td className="py-2 px-4 border-b">{item.subtotal_amount}</td>
-                  <td className="py-2 px-4 border-b">{item.order_status}</td>
-                </tr>
-              ))} */}
+
           </tbody>
         </table>
       </div>
