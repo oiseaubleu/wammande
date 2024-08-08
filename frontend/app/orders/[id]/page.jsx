@@ -51,12 +51,30 @@ export default function OrderDetail() {
   }, [id]);
 
 
-
-  const updateOrder = async () => {
+  /**
+   * 
+   * @param {object[boolean]} 発注を登録するかどうかのフラグ。trueならステータスを発注済みに切り替える
+   */
+  const updateOrder = async ({ willRegisterPurchase }) => {
+    console.log("updateOrder", order);
     const sendOrder = {
       ...order,
-      order_details_attributes: [...order.order_details]
-    }
+      order_date: willRegisterPurchase ? new Date().toISOString().split("T")[0] : order.order_date,
+      order_status: willRegisterPurchase ? 1 : order.order_status,
+      order_details_attributes: order.order_details.map((detail) => {
+        const { id, order_status, ...rest } = detail;
+        if (String(id).match(/^tmp-/)) {
+          // 新規追加の行は、idを消しておく
+          return rest;
+        } else {
+          return {
+            id,
+            order_status: willRegisterPurchase ? 1 : order_status,
+            ...rest,
+          };
+        }
+      })
+    };
 
     const res = await fetch(`http://localhost:3000/orders/${id}`, {
       method: "PUT",
@@ -162,7 +180,6 @@ export default function OrderDetail() {
       order_detail.validationErrors.length === 0
   );
 
-
   //ボタンの出し分け
   const saveOrEditButton = isEditing ? (
     <>
@@ -171,12 +188,24 @@ export default function OrderDetail() {
         ${isSafeToSave ? "bg-blue-500 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"} `}
         disabled={!isSafeToSave}
         onClick={() => {
-          setIsEditing(false); /* 本当はここで保存処理 */
-          updateOrder();//
+          setIsEditing(false);
+          updateOrder({ willRegisterPurchase: false }); //
         }}
       >
-        更新
+        {order.order_status === "not_ordered" ? `一時保存` : `更新`}
       </button>
+      {
+        order.order_status === "not_orderd" && (
+          <button
+            onClick={() => {
+              setIsEditing(false);
+              updateOrder({ willRegisterPurchase: true });
+            }}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700"
+          >
+            発注登録
+          </button>
+        )}
       <button
         className="bg-blue-700 text-white rounded px-4 py-2 hover:bg-blue-800"
         onClick={() => handleAddRow()}
