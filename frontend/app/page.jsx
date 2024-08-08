@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from "next/link";
 // ToDoList Component
-function ToDoList({ todos, onRegister }) {
+function ToDoList({ todos }) {
   return (
     <div className="p-4">
       <h2 className="text-lg font-semibold">ToDo</h2>
@@ -23,12 +23,13 @@ function ToDoList({ todos, onRegister }) {
               <td className="py-2 px-4 border-b text-center">{todo.next_purchase_day.split("T")[0]}</td>
               <td className="py-2 px-4 border-b text-center">{todo.order_date.split("T")[0]}</td>
               <td className="py-2 px-4 border-b text-center">
-                <button
-                  className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
-                  onClick={() => onRegister(todo)}
-                >
-                  発注登録
-                </button>
+                <Link href={`/orders/new?supplier_id=${todo.supplier_id}`} >
+                  <button
+                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
+                  >
+                    発注登録
+                  </button>
+                </Link>
               </td>
             </tr>
           ))}
@@ -47,7 +48,7 @@ function PendingList({ pendings, onEdit }) {
         <thead>
           <tr>
             <th className="py-2 px-4 border-b">仕入先</th>
-            <th className="py-2 px-4 border-b">次回発注予定日</th>
+
             <th className="py-2 px-4 border-b">前回の発注日</th>
             <th className="py-2 px-4 border-b"></th>
           </tr>
@@ -56,7 +57,7 @@ function PendingList({ pendings, onEdit }) {
           {pendings.map((pending, index) => (
             <tr key={index}>
               <td className="py-2 px-4 border-b text-center">{pending.supplier_name}</td>
-              <td className="py-2 px-4 border-b text-center">{pending.next_purchase_day.split("T")[0]}</td>
+
               <td className="py-2 px-4 border-b text-center">{pending.order_date.split("T")[0]}</td>
               <td className="py-2 px-4 border-b text-center">
                 <Link href={`/orders/${pending.order_id}?mode=edit`}>
@@ -154,11 +155,6 @@ export default function Page() {
     return result;
   }
 
-  const handleRegister = (todo) => {
-    // 発注登録処理
-    alert(`発注登録`);
-  };
-
   const handleEdit = (pending) => {
     // 編集処理
     alert(`編集`);
@@ -166,7 +162,7 @@ export default function Page() {
 
   return (
     <div className="container mx-auto">
-      <ToDoList todos={notOrdered} onRegister={handleRegister} />
+      <ToDoList todos={notOrdered} />
       <PendingList pendings={orderedPendingDelivery} onEdit={handleEdit} />
     </div>
   );
