@@ -1,64 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { SupplierNameDropdown } from "./new/page";
 
-// TODO: これを別のコンポーネントに切り出しておく！
-// ordersの直下に OrderRow.jsx の形でおいておく
-/***********************************************
- * 仕入先名の入力フォーム
- ************************************************/
-export function SupplierName({ suppliers, inputRef, supplierSelected }) {
-  const [searchTerm, setSearchTerm] = useState(""); //検索ワード
-  const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
-
-
-  // ドロップダウンメニューの外側をクリックしたら閉じる
-  const dropdownRef = useRef();
-  useEffect(() => {
-    document.addEventListener("mousedown", (e) => {
-      // ドロップダウンメニューの外側をクリックしたら閉じる
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setShowDropdown(false);
-      }
-    });
-  }, []);
-  //検索ワードが変わるたびに、ドロップダウンメニューを表示する
-  const handleInputChange = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-
-    if (term) {
-      setShowDropdown(true);
-    }
-  };
-  //選択されたら、検索ワードを更新して、ドロップダウンメニューを閉じる
-  const handleSupplierSelected = (supplier) => {
-    setSearchTerm(supplier.name);
-    setShowDropdown(false);
-    supplierSelected(supplier.id);
-  };
-
-  return (
-    <>
-      <input
-        type="text"
-        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 text-center`}
-        value={searchTerm}
-        onChange={handleInputChange}
-        onFocus={() => setShowDropdown(true)}
-        required />
-      {showDropdown && (
-        <div ref={dropdownRef}>
-          <SupplierNameDropdown
-            suppliers={suppliers}
-            searchTerm={searchTerm}
-            onSelect={handleSupplierSelected}
-            parentRef={inputRef} />
-        </div>
-      )}
-    </>
-  );
-}
 /***********************************************
  * 仕入品名のドロップダウンメニュー
  ************************************************/
