@@ -40,7 +40,9 @@ class OrdersController < ApplicationController
   # 仕入先情報更新##########
   def update
     if @order.update(order_params)
-      update_next_purchase_day if @order.order_status == 'ordered_pending_delivery'
+      if @order.order_status_changed? && @order.order_status_was == 'not_ordered' && @order.order_status == 'ordered_pending_delivery'
+        update_next_purchase_day
+      end
       render json: @order, include: :order_details
     else
       render json: @order.errors, status: :unprocessable_entity
