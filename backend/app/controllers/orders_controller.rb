@@ -71,6 +71,7 @@ class OrdersController < ApplicationController
   def todo
     not_ordered = OrderRecord.where(order_status: 0).map do |order|
       {
+        order_id: order.id,
         supplier_id: order.supplier_id,
         supplier_name: order.supplier.name,
         supplier_cycle_value: order.supplier.cycle_value,
@@ -83,6 +84,7 @@ class OrdersController < ApplicationController
 
     ordered_pending_delivery = OrderRecord.where(order_status: 1).map do |order|
       {
+        order_id: order.id,
         supplier_id: order.supplier_id,
         supplier_name: order.supplier.name,
         supplier_cycle_value: order.supplier.cycle_value,
