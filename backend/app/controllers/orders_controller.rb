@@ -70,6 +70,11 @@ class OrdersController < ApplicationController
   end
 
   # TOPページに必要な情報を取得
+  # 未発注リストの抽出方法は...
+  # - supplier.next_purchase_dayが今日からX日以内である
+  # - このとき、order_recordが...
+  #   - そもそも存在しない
+  #   - next_purchase_day以前のレコードが存在するがorder_statusがnot_orderedである
   def todo
     not_ordered = OrderRecord.where(order_status: 0).map do |order|
       {
@@ -80,7 +85,6 @@ class OrdersController < ApplicationController
         supplier_cycle_unit: order.supplier.cycle_unit,
         next_purchase_day: order.supplier.next_purchase_day,
         order_date: order.order_date
-
       }
     end
 
