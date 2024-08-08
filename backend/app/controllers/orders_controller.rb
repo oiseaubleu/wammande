@@ -15,6 +15,7 @@ class OrdersController < ApplicationController
     # binding.irb
 
     if @order.save
+      update_next_purchase_day if @order.order_status == 'ordered_pending_delivery'
       render json: @order, status: :created, include: :order_details # 201
     else
       render json: @order.errors, status: :unprocessable_entity
@@ -39,6 +40,7 @@ class OrdersController < ApplicationController
   # 仕入先情報更新##########
   def update
     if @order.update(order_params)
+      update_next_purchase_day if @order.order_status == 'ordered_pending_delivery'
       render json: @order, include: :order_details
     else
       render json: @order.errors, status: :unprocessable_entity
@@ -109,5 +111,11 @@ class OrdersController < ApplicationController
       :supplier_id, :order_status, :order_date, :delivery_date, :total_amount,
       order_details_attributes: %i[id supplier_purchase_id quantity comment subtotal_amount order_status _destroy]
     )
+  end
+
+  def update_next_purchase_day
+    # TODO: 発注がイレギュラーな日付だった場合に、次回発注予定日もくるってしまう
+    # 本当は、定期的な発注と、イレギュラーな発注を区別して次回発注予定日を更新したい
+    @order.supplier.update(next_purchase_day: @order.order_date + @order.supplier.purchase_interval)
   end
 end

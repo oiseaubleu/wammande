@@ -15,4 +15,17 @@ class Supplier < ApplicationRecord
   # enum
   enum cycle_unit: %i[daily weekly monthly yearly]
   enum how_to_order: %i[application direct online email]
+
+  def purchase_interval
+    case cycle_unit
+    when 'daily'
+      cycle_value.days
+    when 'weekly'
+      cycle_value.weeks
+    when 'monthly'
+      cycle_value.months
+    when 'yearly'
+      cycle_value.years
+    end
+  end
 end
