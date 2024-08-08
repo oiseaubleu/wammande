@@ -67,6 +67,29 @@ class OrdersController < ApplicationController
     head :ok
   end
 
+  # TOPページに必要な情報を取得
+  def todo
+    not_ordered = OrderRecord.where(order_status: 0).map do |order|
+      {
+        supplier_id: order.supplier_id,
+        supplier_name: order.supplier.name,
+        next_purchase_day: order.supplier.next_purchase_day,
+        order_date: order.order_date
+      }
+    end
+
+    ordered_pending_delivery = OrderRecord.where(order_status: 1).map do |order|
+      {
+        supplier_id: order.supplier_id,
+        supplier_name: order.supplier.name,
+        next_purchase_day: order.supplier.next_purchase_day,
+        order_date: order.order_date
+      }
+    end
+
+    render json: { not_ordered:, ordered_pending_delivery: }
+  end
+
   ############################
   private
 
