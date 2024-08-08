@@ -61,15 +61,19 @@ export default function OrderDetail() {
       order_date: willRegisterPurchase ? new Date().toISOString().split("T")[0] : order.order_date,
       order_status: willRegisterPurchase ? 1 : order.order_status,
       order_details_attributes: order.order_details.map((detail) => {
-        const { id, order_status, ...rest } = detail;
+        const { id, ...rest } = detail;
+        const order_status = willRegisterPurchase ? 1 : detail.order_status;
         if (String(id).match(/^tmp-/)) {
           // 新規追加の行は、idを消しておく
-          return rest;
+          return {
+            ...rest,
+            order_status,
+          };
         } else {
           return {
             id,
-            order_status: willRegisterPurchase ? 1 : order_status,
             ...rest,
+            order_status,
           };
         }
       })
