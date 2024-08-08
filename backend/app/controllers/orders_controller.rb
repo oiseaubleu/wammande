@@ -73,8 +73,11 @@ class OrdersController < ApplicationController
       {
         supplier_id: order.supplier_id,
         supplier_name: order.supplier.name,
+        supplier_cycle_value: order.supplier.cycle_value,
+        supplier_cycle_unit: order.supplier.cycle_unit,
         next_purchase_day: order.supplier.next_purchase_day,
         order_date: order.order_date
+
       }
     end
 
@@ -82,6 +85,8 @@ class OrdersController < ApplicationController
       {
         supplier_id: order.supplier_id,
         supplier_name: order.supplier.name,
+        supplier_cycle_value: order.supplier.cycle_value,
+        supplier_cycle_unit: order.supplier.cycle_unit,
         next_purchase_day: order.supplier.next_purchase_day,
         order_date: order.order_date
       }
