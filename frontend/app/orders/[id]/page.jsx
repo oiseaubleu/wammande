@@ -164,7 +164,7 @@ export default function OrderDetail() {
   };
 
   const calculateTotal = (orders) => {
-    return orders.reduce((sum, order) => sum + Number(order.subtotal_amount), 0);
+    return orders.filter((order) => !order._destroy).reduce((sum, order) => sum + Number(order.subtotal_amount), 0);
   };
 
 
