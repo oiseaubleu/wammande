@@ -1,19 +1,41 @@
+"use client";
+
 import Link from "next/link";
+import React, { useState, useEffect } from 'react';
 
 export default function RemainingBudget() {
+  //今月の予算残高と、予算状態メッセージを受け取る
+  const [remainingBudget, setRemainingBudget] = useState(null);
+  const [displayMessage, setDisplayMessage] = useState("");
+
+  useEffect(() => {
+    async function fetchGetRemainingInfo() {
+      const res = await fetch("http://localhost:3000/budgets/remaining", {
+        mode: "cors",
+      });
+      const data = await res.json();
+      console.log(data);
+      setRemainingBudget(data.remaining_budget);
+      setDisplayMessage(data.display_message);
+    }
+    fetchGetRemainingInfo();
+  }, []);
+
+
+
   return (
     <div className="flex flex-col items-end">
       <p className="bg-yellow-200 p-2 rounded mb-2 font-light ">
-        もうすぐ超過します!!
+        {displayMessage}
       </p>
       <div className="flex flex-row justify-end w-full">
         <h2 className="text-2xl m-5 font-light">Remaining Budget</h2>
-        <p className="text-2xl m-5 font-bold">$1,000.00</p>
-        <Link href={"/budgets"}>
+        <p className="text-2xl m-5 font-bold"> € {remainingBudget} EUR</p>
+        {/* <Link href={"/budgets"}>
           <button className="p-2 m-5 rounded bg-slate-300 hover:bg-sky-300">
             Edit Budget
           </button>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
