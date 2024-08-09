@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 // 既存の予算を編集するためのコンポーネント
-function BudgetRow({ budget, onSave, onDelete }) {
+function BudgetRow({ budget, onSave, onDelete, remainingBudget }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editYear, setEditYear] = useState(budget.year);
   const [editMonth, setEditMonth] = useState(budget.month);
@@ -60,7 +60,7 @@ function BudgetRow({ budget, onSave, onDelete }) {
 
       <td>
         <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-          残額いれたい
+          {remainingBudget.remaining_budget}
         </span>
       </td>
 
@@ -96,7 +96,7 @@ function BudgetRow({ budget, onSave, onDelete }) {
 
       <td>
         <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-          使用率いれたい
+          {Math.round(Number(remainingBudget.remaining_budget) / Number(budget.purchase_budget) * 100)}%
         </span>
       </td>
 
@@ -241,11 +241,35 @@ function NewBudgetForm({ onSave, onCancel }) {
   );
 }
 
+
+//指定した年月の予算残高を取得する関数
+function getBudgetInfo(year, month, data) {
+  // 指定したyearとmonthに一致するオブジェクトを検索
+  const budget = data.find(item => item.year === year && item.month === month);
+
+  // 一致するオブジェクトが存在すればremaining_budgetとtotal_budgetを返す
+  if (budget) {
+    return {
+      remaining_budget: budget.remaining_budget,
+      total_budget: budget.total_budget
+    };
+  } else {
+    // 一致するオブジェクトが見つからない場合、nullを返す
+    return null;
+  }
+}
+
+
+
+
+
+
 // 予算一覧ページのコンポーネント
 export default function BudgetList() {
   const [budgets, setBudgets] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [remainingBudgets, setRemainingBudgets] = useState([]);
 
   useEffect(() => {
     async function fetchBudgetData() {
@@ -259,6 +283,24 @@ export default function BudgetList() {
     }
     fetchBudgetData();
   }, []);
+
+  //全年月の予算残高
+  useEffect(() => {
+    async function fetchReminingData() {
+      const res = await fetch("http://localhost:3000/budgets/remaining", {
+        mode: "cors",
+      });
+      const data = await res.json();
+      console.log(data);
+      setRemainingBudgets(data.all_remaining_budgets);
+    }
+    fetchReminingData();
+  }, []);
+
+
+
+
+
 
   const handleAddNew = () => {
     setIsAdding(true);
@@ -346,6 +388,7 @@ export default function BudgetList() {
           <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
         </div>
       ) : (
+
         <table className="min-w-full bg-white border">
           <thead>
             <tr className="bg-gray-200">
@@ -372,6 +415,9 @@ export default function BudgetList() {
                 budget={budget}
                 onSave={handleSave}
                 onDelete={handleDelete}
+                remainingBudget={
+                  remainingBudgets.find((remainingBudget) => budget.year === remainingBudget.year && budget.month === remainingBudget.month)
+                }
               />
             ))}
           </tbody>
