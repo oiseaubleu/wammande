@@ -21,13 +21,27 @@ export default function RemainingBudget() {
     fetchGetRemainingInfo();
   }, []);
 
-
+  function budgetStatusMessage() {
+    if (displayMessage == 'over budget') {
+      return (
+        <p className="bg-red-200 p-2 rounded mb-2 font-light ">
+          予算超過しています！！！
+        </p>
+      )
+    } else if (displayMessage == 'warning') {
+      return (
+        <p className="bg-yellow-200 p-2 rounded mb-2 font-light ">
+          もうすぐ予算超過します！！！
+        </p>
+      )
+    } else {
+      return (<p></p>)
+    }
+  }
 
   return (
     <div className="flex flex-col items-end">
-      <p className="bg-yellow-200 p-2 rounded mb-2 font-light ">
-        {displayMessage}
-      </p>
+      {budgetStatusMessage()}
       <div className="flex flex-row justify-end w-full">
         <h2 className="text-2xl m-5 font-light">Remaining Budget</h2>
         <p className="text-2xl m-5 font-bold"> € {remainingBudget} EUR</p>
@@ -40,3 +54,5 @@ export default function RemainingBudget() {
     </div>
   );
 }
+
+

@@ -60,7 +60,7 @@ function BudgetRow({ budget, onSave, onDelete, remainingBudget }) {
 
       <td>
         <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-          {remainingBudget.remaining_budget}
+          {remainingBudget?.remaining_budget}
         </span>
       </td>
 
@@ -96,7 +96,7 @@ function BudgetRow({ budget, onSave, onDelete, remainingBudget }) {
 
       <td>
         <span className="block py-1.5 text-gray-900 shadow-sm focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-          {Math.round(Number(remainingBudget.remaining_budget) / Number(budget.purchase_budget) * 100)}%
+          {Math.round(Number(remainingBudget?.remaining_budget) / Number(budget.purchase_budget) * 100)}%
         </span>
       </td>
 
