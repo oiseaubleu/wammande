@@ -40,7 +40,7 @@ class BudgetsController < ApplicationController
     head :ok
   end
 
-  # 予算残額と表示
+  # 予算残額と表示（今月分のみ）
   # 現在の月の最初の日と最後の日を取得し、その月に発生した全ての注文の合計金額 (total_amount) を計算
   # 予算額から合計金額を引いた残額を計算し、JSON形式で返す
   def remaining
@@ -50,9 +50,7 @@ class BudgetsController < ApplicationController
     current_month = Date.current.month
 
     total_amount = OrderRecord.where(order_date: start_date..end_date).sum(:total_amount)
-    # 現在の年と月に一致する予算を取得
     budget = Budget.find_by(year: current_year, month: current_month)
-    # 予算が存在する場合に remaining_budget を計算
 
     if budget
       remaining_budget = budget.purchase_budget - total_amount
@@ -70,7 +68,11 @@ class BudgetsController < ApplicationController
                         'none'
                       end
 
-    render json: { remaining_budget:, display_message: }
+    # RemainingBudgetCalculatorを使用してall_remaining_budgetsを取得
+    calculator = RemainingBudgetCalculator.new
+    all_remaining_budgets = calculator.calculate
+
+    render json: { remaining_budget:, display_message:, all_remaining_budgets: all_remaining_budgets.to_a }
   end
 
   ############################
