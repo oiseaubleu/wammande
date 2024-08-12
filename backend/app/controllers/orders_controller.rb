@@ -1,4 +1,6 @@
 class OrdersController < ApplicationController
+  include Authenticatable
+
   before_action :set_order, only: %i[show update destroy]
   skip_before_action :verify_authenticity_token # #後で消す
 

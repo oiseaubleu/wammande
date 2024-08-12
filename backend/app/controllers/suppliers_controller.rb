@@ -1,4 +1,5 @@
 class SuppliersController < ApplicationController
+  include Authenticatable
   before_action :set_supplier, only: %i[show update destroy]
   skip_before_action :verify_authenticity_token # #後で消す
 
