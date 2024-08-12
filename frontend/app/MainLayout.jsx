@@ -2,6 +2,7 @@
 
 import { useAuth } from "./context/auth";
 import { usePathname } from 'next/navigation';
+import Link from "next/link";
 
 import NavBar from "./NavBar";
 import RemainingBudget from "./RemainingBudget";
@@ -14,12 +15,14 @@ export default function MainLayout({ children }) {
 
   return (
     <>
-      { isCallbackRoute || isAuthenticated ? (
+      {isCallbackRoute || isAuthenticated ? (
         <>
           <div className="basis-3/4 p-8 flex flex-col">
             <header className="justify-between items-center bg-">
               <div>
-                <h1 className="text-4xl font-extralight">Wa'Mmande</h1>
+                <Link href="/">
+                  <h1 className="text-4xl font-extralight cursor-pointer">Wa'Mmande</h1>
+                </Link>
               </div>
               <div>{<RemainingBudget />}</div>
               <hr className="my-4" />
@@ -31,7 +34,7 @@ export default function MainLayout({ children }) {
       ) : (
         <div className="flex flex-row h-screen">
           <div className="m-auto">
-              <LoginForm />
+            <LoginForm />
           </div>
         </div>
       )}
