@@ -68,7 +68,6 @@ const useSupplier = (id) => {
    * @param {any} value value to update
    */
   const updateSupplierPurchase = (id, field, value) => {
-    console.log(id, field, value);
     setSupplier((prevSupplier) => ({
       ...prevSupplier,
       supplier_purchases: prevSupplier.supplier_purchases.map((purchase) =>
@@ -81,7 +80,6 @@ const useSupplier = (id) => {
    * その行のOKボタンを押したときにその行の情報を更新する
    */
   const replaceSupplierPurchase = (id, newPurchase) => {
-    console.log("replacing supplierPurchase", id, newPurchase);
     setSupplier((prevSupplier) => ({
       ...prevSupplier,
       supplier_purchases: prevSupplier.supplier_purchases.map((purchase) =>
@@ -137,7 +135,6 @@ const useSupplier = (id) => {
   const saveSupplier = (dataToSave) => {
     async function updateData(requestBody) {
       if (id === "new") {
-        console.log("creating", requestBody);
         const res = await fetch(`http://localhost:3000/suppliers`, {
           method: "POST",
           mode: "cors",
@@ -150,13 +147,12 @@ const useSupplier = (id) => {
           alert("登録に失敗しました。");
         } else {
           const data = await res.json();
-          console.log(data);
+          console.log("retrieved data from POST /suppliers", data);
           setSupplier(data);
           // 新規登録後は、IDが返ってくるので、そのIDにリダイレクトする
           window.location.href = `/suppliers/${data.id}`;
         }
       } else {
-        console.log("updating", requestBody);
         const res = await fetch(`http://localhost:3000/suppliers/${id}`, {
           method: "PUT",
           mode: "cors",
@@ -169,7 +165,7 @@ const useSupplier = (id) => {
           alert("更新に失敗しました。");
         } else {
           const data = await res.json();
-          console.log(data);
+          console.log("retrieved data from PUT /suppliers", data);
           setSupplier(data);
         }
       }

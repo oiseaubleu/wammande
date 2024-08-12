@@ -21,7 +21,7 @@ export default function OrderList() {
         mode: "cors",
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from GET /orders", data);
       setOrders(data);
       setIsLoading(false);
     }
@@ -35,7 +35,7 @@ export default function OrderList() {
         mode: "cors",
       });
       const supplierList = await res.json();
-      console.log(supplierList);
+      console.log("retrieved data from GET /suppliers", supplierList);
       setSuppliers(
         supplierList.reduce(
           (obj, item) => ((obj[item.id] = { ...item }), obj),
@@ -47,12 +47,9 @@ export default function OrderList() {
     fetchSupplierData();
   }, []);
 
-
-
-
   const handleSearch = () => {
     // 検索ロジックを追加します。
-    console.log("Search clicked");
+    console.log("Search clicked [not implemented]");
   };
 
   const handleSortByDate = () => {

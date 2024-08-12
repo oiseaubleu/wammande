@@ -2,24 +2,32 @@
 
 import Link from "next/link";
 import React, { useState, useEffect } from 'react';
+import { useAuth } from "./context/auth";
 
 export default function RemainingBudget() {
   //今月の予算残高と、予算状態メッセージを受け取る
   const [remainingBudget, setRemainingBudget] = useState(null);
   const [displayMessage, setDisplayMessage] = useState("");
+  const { isAuthenticated, getAccessToken } = useAuth();
 
   useEffect(() => {
     async function fetchGetRemainingInfo() {
+      const accessToken = await getAccessToken();
       const res = await fetch("http://localhost:3000/budgets/remaining", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from GET /budgets/remaining", data);
       setRemainingBudget(data.remaining_budget);
       setDisplayMessage(data.display_message);
     }
-    fetchGetRemainingInfo();
-  }, []);
+    if (isAuthenticated) {
+      fetchGetRemainingInfo();
+    }
+  }, [isAuthenticated]);
 
   function budgetStatusMessage() {
     if (displayMessage == 'over budget') {

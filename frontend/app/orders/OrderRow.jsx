@@ -109,7 +109,6 @@ export function OrderRow({ index, orderDetail, onUpdate, onDelete, supplierPurch
 
   const handleUpdate = (field, value) => {
     const updatedOrderDetail = { ...orderDetail, [field]: value };
-    console.log("field", field, "value", value, "updatedOrderDetail", updatedOrderDetail);
     onUpdate(index, updatedOrderDetail);
   };
 

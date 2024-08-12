@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/auth";
 
 // 既存の予算を編集するためのコンポーネント
 function BudgetRow({ budget, onSave, onDelete, remainingBudget }) {
@@ -269,33 +270,46 @@ export default function BudgetList() {
   const [budgets, setBudgets] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { isAuthenticated, getAccessToken } = useAuth();
   const [remainingBudgets, setRemainingBudgets] = useState([]);
 
   useEffect(() => {
     async function fetchBudgetData() {
+      const accessToken = await getAccessToken();
       const res = await fetch("http://localhost:3000/budgets", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
       });
       const data = await res.json();
-      console.log(data);
-      setBudgets(data);
+      console.log("retrieved data from GET /budgets", data);
+      setBudgets(data || []);
       setIsLoading(false);
     }
-    fetchBudgetData();
-  }, []);
+    if (isAuthenticated) {
+      fetchBudgetData();
+    }
+  }, [isAuthenticated]);
 
   //全年月の予算残高
   useEffect(() => {
     async function fetchReminingData() {
+      const accessToken = await getAccessToken();
       const res = await fetch("http://localhost:3000/budgets/remaining", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
       });
       const data = await res.json();
       console.log(data);
       setRemainingBudgets(data.all_remaining_budgets);
     }
-    fetchReminingData();
-  }, []);
+    if (isAuthenticated) {
+      fetchReminingData();
+    }
+  }, [isAuthenticated]);
 
 
 
@@ -308,18 +322,19 @@ export default function BudgetList() {
 
   const handleSaveNewBudgets = (newBudget) => {
     async function registerData() {
+      const accessToken = await getAccessToken();
       const res = await fetch("http://localhost:3000/budgets", {
         method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(newBudget),
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from POST /budgets", data);
       setBudgets([...budgets, data]);
-      console.log(budgets);
       setIsAdding(false);
     }
     registerData();
@@ -327,11 +342,13 @@ export default function BudgetList() {
 
   const handleSave = (id, updatedBudget) => {
     async function updateData() {
+      const accessToken = await getAccessToken();
       const res = await fetch(`http://localhost:3000/budgets/${id}`, {
         method: "PUT",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(updatedBudget),
       });
@@ -356,9 +373,13 @@ export default function BudgetList() {
   const handleDelete = (id) => {
     async function deleteData() {
       const budgetBeforeDelete = [...budgets];
+      const accessToken = await getAccessToken();
       const res = await fetch(`http://localhost:3000/budgets/${id}`, {
         method: "DELETE",
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
       });
       if (res.status >= 400) {
         setBudgets(budgetBeforeDelete);

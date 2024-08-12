@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-import NavBar from "./NavBar";
-import RemainingBudget from "./RemainingBudget";
+import { AuthProvider, useAuth } from "./context/auth";
+import MainLayout from "./MainLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,17 +15,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <div className="flex flex-row h-screen">
-          <div className="basis-3/4 p-8 flex flex-col">
-            <header className="justify-between items-center bg-">
-              <div>
-                <h1 className="text-4xl font-extralight">Wa'Mmande</h1>
-              </div>
-              <div>{<RemainingBudget />}</div>
-              <hr className="my-4" />
-            </header>
-            <main className="">{children}</main>
-          </div>
-          <aside className="basis-1/4 p-8 bg-slate-50">{<NavBar />}</aside>
+          <AuthProvider>
+            <MainLayout>{children}</MainLayout>
+          </AuthProvider>
         </div>
       </body>
     </html>

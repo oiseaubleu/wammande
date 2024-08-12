@@ -88,7 +88,7 @@ export default function Page() {
         mode: "cors",
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from GET /orders/todo", data);
       setNotOrdered(makeNotOrderedData(data.not_ordered));
       setOrderedPendingDelivery(data.ordered_pending_delivery);
     }

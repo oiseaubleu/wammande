@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LoginForm from "./LoginForm";
 
 export default function NavBar() {
   const navBarItems = [
@@ -19,6 +20,10 @@ export default function NavBar() {
           </button>
         </li>
       ))}
+      <hr className="my-4" />
+      <li className="mb-2">
+        <LoginForm />
+      </li>
     </ul>
   );
 }

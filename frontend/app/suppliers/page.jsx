@@ -15,7 +15,7 @@ export default function Page() {
         mode: "cors",
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from GET /suppliers", data);
       setSuppliers(data);
       setIsLoading(false);
     }

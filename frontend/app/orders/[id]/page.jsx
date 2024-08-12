@@ -14,7 +14,6 @@ export default function OrderDetail() {
 
   const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
   useEffect(() => {
-    console.log("mode", searchParams.get("mode"));
     if (searchParams.get("mode") === "edit") {
       setIsEditing(true);
     }
@@ -34,13 +33,13 @@ export default function OrderDetail() {
         mode: "cors",
       });
       const order = await orderRes.json();
-      console.log(order);
+      console.log("retrieved data from GET /orders/:id", order);
 
       const supplierPurchasesRes = await fetch(`http://localhost:3000/suppliers/${order.supplier_id}`, {
         mode: "cors",
       });
       const supplier = await supplierPurchasesRes.json();
-      console.log(supplier);
+      console.log("retrieved data from GET /suppliers/:id", supplier);
 
       setPurchases(supplier.supplier_purchases);
       setOrder(order);
@@ -55,7 +54,6 @@ export default function OrderDetail() {
    * @param {object[boolean]} 発注を登録するかどうかのフラグ。trueならステータスを発注済みに切り替える
    */
   const updateOrder = async ({ willRegisterPurchase }) => {
-    console.log("updateOrder", order);
     const sendOrder = {
       ...order,
       order_date: willRegisterPurchase ? new Date().toISOString().split("T")[0] : order.order_date,
@@ -95,7 +93,7 @@ export default function OrderDetail() {
   };
 
   const handlePDFExport = () => {
-    console.log("PDF Export button clicked");
+    console.log("PDF Export button clicked [not implemented]");
   };
 
   if (isLoading) {
@@ -146,8 +144,6 @@ export default function OrderDetail() {
    * @param {number | string} index orderDetailのID。新規追加の場合は `tmp-xxxx` という文字列
    */
   const handleDeleteRow = (index) => {
-    console.log("delete", index);
-    // TODO: 編集画面では、order_detailsから消すのではなくて、 `_destroy: true` を足す必要がある
     let updatedOrderDetails;
     if (String(index).match(/^tmp-/)) {
       // 新規追加してすぐの行は、そのまま削除してしまってOK

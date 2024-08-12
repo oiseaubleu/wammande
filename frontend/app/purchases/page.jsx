@@ -156,7 +156,7 @@ export default function Page() {
         mode: "cors", //ただのGETなのでmethod不要
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from GET /purchases", data);
       setPurchases(data);
       setIsLoading(false);
     }
@@ -178,9 +178,8 @@ export default function Page() {
         body: JSON.stringify(newPurchase),
       });
       const data = await res.json();
-      console.log(data);
+      console.log("retrieved data from POST /purchases", data);
       setPurchases([...purchases, data]);
-      console.log(purchases);
       setIsAdding(false);
     }
     registerData();
@@ -207,7 +206,7 @@ export default function Page() {
         setPurchases(purchases);
       } else {
         const data = await res.json();
-        console.log(data);
+        console.log("retrieved data from PUT /purchases", data);
         setPurchases(
           purchases.map((purchase) =>
             purchase.id === data.id ? data : purchase

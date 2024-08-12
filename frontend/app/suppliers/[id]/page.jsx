@@ -31,7 +31,6 @@ export default function SupplierDetail() {
 
   const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
   useEffect(() => {
-    console.log("mode", searchParams.get("mode"));
     if (searchParams.get("mode") === "edit") {
       setIsEditing(true);
     }
