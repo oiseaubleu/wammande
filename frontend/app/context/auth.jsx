@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 // retrieve these values from Next.js environment variables
+//ヘッダに入れるべきアクセストークンを取得するための処理
 const COGNITO_CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
 const COGNITO_DOMAIN = process.env.NEXT_PUBLIC_COGNITO_DOMAIN;
 
@@ -74,11 +75,12 @@ const AuthProvider = ({ children }) => {
    * @returns 成功したかどうか
    */
   const handleAuthCallback = async () => {
+    // URLSearchParamsを使って、URLのクエリパラメータを取得する
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     //const state = urlParams.get('state');
     const redirectUri = `${window.location.origin}/auth/callback`;
-
+    // Cognitoにアクセスして、アクセストークンを取得する
     const response = await fetch(`https://${COGNITO_DOMAIN}/oauth2/token`, {
       method: 'POST',
       headers: {
@@ -139,7 +141,9 @@ const AuthProvider = ({ children }) => {
     }
     return data.access_token;
   }
-
+  // ブラウザの保存場所からアクセストークンを取得する
+  // アクセストークンが期限切れだったら、リフレッシュトークンを使って新しいアクセストークンを取得する
+  //なので、アクセストークンは直接渡さず、メソッドで渡す
   const getAccessToken = async () => {
     // Wait for the initial authentication process to complete
     while (loading) {
@@ -155,7 +159,7 @@ const AuthProvider = ({ children }) => {
 
     return await refreshAccessToken();
   }
-
+  // childrenがcontext（アクセストークンを取得できるメソッドが入ってたりするもの）を使えるようにする 
   return (
     <AuthContext.Provider value={{ isAuthenticated, idToken, refreshToken, user, login, logout, handleAuthCallback, getAccessToken }}>
       {children}
@@ -164,6 +168,7 @@ const AuthProvider = ({ children }) => {
 };
 
 const useAuth = () => {
+  //
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

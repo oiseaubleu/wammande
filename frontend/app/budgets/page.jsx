@@ -270,16 +270,16 @@ export default function BudgetList() {
   const [budgets, setBudgets] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAuthenticated, getAccessToken } = useAuth();
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
   const [remainingBudgets, setRemainingBudgets] = useState([]);
 
   useEffect(() => {
     async function fetchBudgetData() {
-      const accessToken = await getAccessToken();
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch("http://localhost:3000/budgets", {
         mode: "cors",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
         }
       });
       const data = await res.json();
@@ -287,10 +287,10 @@ export default function BudgetList() {
       setBudgets(data || []);
       setIsLoading(false);
     }
-    if (isAuthenticated) {
+    if (isAuthenticated) { //4. 認証情報が取得できたらデータを取得
       fetchBudgetData();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated]);//5. 認証情報が変更されたら再度データを取得　ページを読み込んだ瞬間は認証情報が取得できていないので、認証情報が取得できたらデータを取得するようにする
 
   //全年月の予算残高
   useEffect(() => {
