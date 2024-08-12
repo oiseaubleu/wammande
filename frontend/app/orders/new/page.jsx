@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { OrderRow } from "../OrderRow";
+import { useAuth } from "../../context/auth";
 
 /***********************************************
  * 仕入先情報を取得
@@ -124,6 +125,7 @@ export default function OrderRegistration() {
   const [totalAmount, setTotalAmount] = useState(0);
   const inputRef = useRef();
 
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
   const searchParams = useSearchParams();
   useEffect(() => {
     if (searchParams.get("supplier_id") && suppliers.length > 0) {
@@ -189,10 +191,12 @@ export default function OrderRegistration() {
    * POST orders
    */
   const saveOrder = async (order) => {
+    const accessToken = await getAccessToken();
     const res = await fetch("http://localhost:3000/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
       },
       body: JSON.stringify(order),
       mode: "cors",

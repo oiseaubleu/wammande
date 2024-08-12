@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SupplierName, OrderRow } from "../OrderRow";
+import { useAuth } from "../../context/auth";
 
 export default function OrderDetail() {
   const { id } = useParams();
@@ -11,6 +12,7 @@ export default function OrderDetail() {
   const [purchases, setPurchases] = useState({});//発注先の仕入れ品情報すべて
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
 
   const searchParams = useSearchParams(); // URLのクエリパラメータを取得するためのフック
   useEffect(() => {
@@ -29,14 +31,21 @@ export default function OrderDetail() {
      *    →ここでorderのstateが変化したので、下のほうにある order.order_details.map... の処理が動いて各行が描画される
      */
     async function fetchOrderData() {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const orderRes = await fetch(`http://localhost:3000/orders/${id}`, {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const order = await orderRes.json();
       console.log("retrieved data from GET /orders/:id", order);
 
       const supplierPurchasesRes = await fetch(`http://localhost:3000/suppliers/${order.supplier_id}`, {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const supplier = await supplierPurchasesRes.json();
       console.log("retrieved data from GET /suppliers/:id", supplier);
@@ -45,8 +54,10 @@ export default function OrderDetail() {
       setOrder(order);
       setIsLoading(false);
     }
-    fetchOrderData();
-  }, [id]);
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchOrderData();
+    }
+  }, [id, isAuthenticated]);
 
 
   /**
@@ -54,6 +65,7 @@ export default function OrderDetail() {
    * @param {object[boolean]} 発注を登録するかどうかのフラグ。trueならステータスを発注済みに切り替える
    */
   const updateOrder = async ({ willRegisterPurchase }) => {
+    const accessToken = await getAccessToken(); //1. アクセストークンを取得
     const sendOrder = {
       ...order,
       order_date: willRegisterPurchase ? new Date().toISOString().split("T")[0] : order.order_date,
@@ -81,6 +93,7 @@ export default function OrderDetail() {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(sendOrder),
       mode: "cors",

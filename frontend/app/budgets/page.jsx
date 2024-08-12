@@ -287,10 +287,10 @@ export default function BudgetList() {
       setBudgets(data || []);
       setIsLoading(false);
     }
-    if (isAuthenticated) { //4. 認証情報が取得できたらデータを取得
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
       fetchBudgetData();
     }
-  }, [isAuthenticated]);//5. 認証情報が変更されたら再度データを取得　ページを読み込んだ瞬間は認証情報が取得できていないので、認証情報が取得できたらデータを取得するようにする
+  }, [isAuthenticated]);//4. 認証情報が変更されたら再度データを取得　ページを読み込んだ瞬間は認証情報が取得できていないので、認証情報が取得できたらデータを取得するようにする
 
   //全年月の予算残高
   useEffect(() => {

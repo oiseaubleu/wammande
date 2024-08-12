@@ -8,19 +8,28 @@ import { useAuth } from '../context/auth';
 export default function Page() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
   // ユーザー一覧の取得
   useEffect(() => {
     const fetchData = async () => {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch('http://localhost:3000/users', {
         mode: 'cors',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const data = await res.json();
       setUsers(data);
       setIsLoading(false);
     };
-    fetchData();
-  }, []);
+
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData();
+    }
+
+
+  }, [isAuthenticated]);
 
   return (<>
     <Link href="/users/new?mode=edit">

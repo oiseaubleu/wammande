@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
+
 import Link from "next/link";
 
 export default function Page() {
@@ -12,23 +13,33 @@ export default function Page() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isNew, setIsNew] = useState(false);
-
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
   const { id } = useParams();
   useEffect(() => {
     const fetchData = async (id) => {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       if (id === "new") {
         setIsNew(true);
         return;
       } else {
         const res = await fetch(`http://localhost:3000/users/${id}`, {
           mode: "cors",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+          }
         });
         const data = await res.json();
         setUser(data);
       }
     };
-    fetchData(id);
-  }, [id]);
+
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData(id);
+    }
+
+
+
+  }, [id, isAuthenticated]);
 
   const { mode } = useSearchParams();
   useEffect(() => {
@@ -46,6 +57,7 @@ export default function Page() {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
         },
         body: JSON.stringify(user),
       });
@@ -58,6 +70,7 @@ export default function Page() {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
         },
         body: JSON.stringify(user),
       });

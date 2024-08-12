@@ -2,25 +2,31 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-
+import { useAuth } from "../context/auth";
 // 仕入先一覧ページのコンポーネント
 export default function Page() {
   const [suppliers, setSuppliers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
   //ページが読み込まれたときにAPIからデータを取ってくる
   useEffect(() => {
     async function fetchData() {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch("http://localhost:3000/suppliers", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const data = await res.json();
       console.log("retrieved data from GET /suppliers", data);
       setSuppliers(data);
       setIsLoading(false);
     }
-    fetchData();
-  }, []);
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData();
+    }
+  }, [isAuthenticated]);//4. 認証情報が変更されたら再度データを取得
 
   //const [isClient, setIsClient] = useState(false);
 
@@ -37,9 +43,13 @@ export default function Page() {
 
   const handleDelete = (id) => {
     async function deleteData(id) {
+      const accessToken = await getAccessToken()
       const res = await fetch(`http://localhost:3000/suppliers/${id}`, {
         method: "DELETE",
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       setSuppliers(suppliers.filter((supplier) => supplier.id !== id));
     }

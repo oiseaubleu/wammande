@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useAuth } from "../../context/auth";
 /**
  * 仕入先を管理するためのカスタムフック
  *
@@ -22,11 +22,16 @@ const useSupplier = (id) => {
   const [purchases, setPurchases] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
 
   useEffect(() => {
     async function fetchData(id) {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const purchasesResponse = await fetch(`http://localhost:3000/purchases`, {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const purchaseList = await purchasesResponse.json();
       setPurchases(
@@ -38,10 +43,14 @@ const useSupplier = (id) => {
         )
       );
       if (id !== "new") {
+
         const supplierResponse = await fetch(
           `http://localhost:3000/suppliers/${id}`,
           {
             mode: "cors",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+            }
           }
         );
         const data = await supplierResponse.json();
@@ -49,8 +58,10 @@ const useSupplier = (id) => {
       }
       setIsLoading(false);
     }
-    fetchData(id);
-  }, [id]);
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData(id);
+    }
+  }, [id, isAuthenticated]);
 
   //仕入先の更新
   const updateSupplier = (field, value) => {
@@ -134,12 +145,14 @@ const useSupplier = (id) => {
 
   const saveSupplier = (dataToSave) => {
     async function updateData(requestBody) {
+      const accessToken = await getAccessToken()
       if (id === "new") {
         const res = await fetch(`http://localhost:3000/suppliers`, {
           method: "POST",
           mode: "cors",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
           },
           body: JSON.stringify(requestBody),
         });
@@ -158,6 +171,7 @@ const useSupplier = (id) => {
           mode: "cors",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
           },
           body: JSON.stringify(requestBody),
         });
@@ -181,7 +195,13 @@ const useSupplier = (id) => {
       }),
       ...rest,
     };
-    updateData(supplier);
+
+    if (isAuthenticated) {
+      updateData(supplier);
+    }
+
+
+
   };
 
   return {

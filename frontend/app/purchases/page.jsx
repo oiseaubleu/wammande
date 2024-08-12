@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
+import { useAuth } from "../context/auth";
 // 既存の仕入品を編集するためのコンポーネント
 function PurchaseRow({ purchase, onSave, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -147,21 +147,28 @@ export default function Page() {
   // {id: 1, name: '仕入品sample', is_food: true, created_at: '2024-07-24T08:17:34.642Z', updated_at: '2024-07-24T08:17:34.642Z'}
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
 
   // ページが読み込まれたときに、APIからデータを取ってくる
   //最初に取ってくるだけでいい（追加の時は再レンダリング不要なので）ので空配列渡す
   useEffect(() => {
     async function fetchData() {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch("http://localhost:3000/purchases", {
         mode: "cors", //ただのGETなのでmethod不要
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const data = await res.json();
       console.log("retrieved data from GET /purchases", data);
       setPurchases(data);
       setIsLoading(false);
     }
-    fetchData();
-  }, []);
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   const handleAddNew = () => {
     setIsAdding(true);
@@ -169,11 +176,13 @@ export default function Page() {
 
   const handleSaveNewPurchase = (newPurchase) => {
     async function registerData() {
+      const accessToken = await getAccessToken()
       const res = await fetch("http://localhost:3000/purchases", {
         method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
         },
         body: JSON.stringify(newPurchase),
       });
@@ -191,6 +200,7 @@ export default function Page() {
 
   const handleSave = (id, updatedPurchase) => {
     async function updateData() {
+      const accessToken = await getAccessToken()
       // TODO: 更新失敗した場合は、再読み込みするまでデータがずれた状態となる
       // 本当は成功するまで「更新中...」みたいな表示を出すべき
       const res = await fetch(`http://localhost:3000/purchases/${id}`, {
@@ -198,6 +208,7 @@ export default function Page() {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`
         },
         body: JSON.stringify(updatedPurchase),
       });
@@ -219,10 +230,14 @@ export default function Page() {
 
   const handleDelete = (id) => {
     async function deleteData() {
+      const accessToken = await getAccessToken()
       const purchasesBeforeDelete = [...purchases];
       const res = await fetch(`http://localhost:3000/purchases/${id}`, {
         method: "DELETE",
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       if (res.status >= 400) {
         setPurchases(purchasesBeforeDelete);
