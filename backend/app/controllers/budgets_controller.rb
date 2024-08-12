@@ -1,4 +1,6 @@
 class BudgetsController < ApplicationController
+  include Authenticatable
+
   # before_action :set_admin, only: %i[show edit update destroy]
   # before_action :correct_admin # , only: %i[show edit update destroy]
   before_action :set_budget, only: %i[update destroy]

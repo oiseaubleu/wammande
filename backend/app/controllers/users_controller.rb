@@ -1,26 +1,46 @@
 class UsersController < ApplicationController
   # before_action :set_admin, only: %i[show edit update destroy]
-  #before_action :correct_admin # , only: %i[show edit update destroy]
-  before_action :set_user, only: %i[update destroy]
+  # before_action :correct_admin # , only: %i[show edit update destroy]
+  before_action :set_user, only: %i[update destroy show]
   # skip_before_action :login_required, only: %i[new create]
-  skip_before_action :verify_authenticity_token##後で消す
-  
+  skip_before_action :verify_authenticity_token # #後で消す
+
   # ユーザ一覧の表示
   def index
     @users = User.all
     render json: @users
   end
 
+  def show
+    render json: @user
+  end
 
   # ユーザの新規登録
   def create
     @user = User.new(user_params)
-    
-    binding.irb
+
+    # ひとまずナイーブに
+    client = Aws::CognitoIdentityProvider::Client.new(region: 'ap-northeast-1')
+    resp = client.admin_create_user(
+      user_pool_id: ENV['COGNITO_USER_POOL_ID'],
+      desired_delivery_mediums: ['EMAIL'],
+      temporary_password: SecureRandom.alphanumeric + '1A!',
+      username: @user.email.split('@').first,
+      user_attributes: [
+        { name: 'name', value: @user.name },
+        { name: 'email', value: @user.email },
+        { name: 'email_verified', value: 'true' }
+      ]
+    )
+    if resp.user.attributes.find { |attr| attr.name == 'sub' }
+      @user.subject = resp.user.attributes.find { |attr| attr.name == 'sub' }.value
+      @user.cognito_status = 'confirmed'
+    end
+
     if @user.save
-      render json: @user, status: :created #201
+      render json: @user, status: :created # 201
     else
-      render json: @user.errors, status: :unprocessable_entity #422
+      render json: @user.errors, status: :unprocessable_entity # 422
     end
   end
 
