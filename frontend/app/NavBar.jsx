@@ -15,9 +15,9 @@ export default function NavBar() {
     <ul className="w-full">
       {navBarItems.map((item) => (
         <li key={item.name} className="mb-2">
-          <button className="block p-2 rounded bg-slate-300 hover:bg-sky-300 w-full">
-            <Link href={item.link}>{item.name}</Link>
-          </button>
+          <Link href={item.link} className="block p-2 rounded bg-slate-300 hover:bg-sky-300 w-full text-center">
+            {item.name}
+          </Link>
         </li>
       ))}
       <hr className="my-4" />
