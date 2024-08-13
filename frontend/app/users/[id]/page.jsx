@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 
 import Link from "next/link";
-
+import { useAuth } from "../../context/auth";
 export default function Page() {
   const [user, setUser] = useState({
     name: "",
@@ -51,7 +51,9 @@ export default function Page() {
   }
 
   const saveUser = async () => {
+    const accessToken = await getAccessToken();
     if (isNew) {
+
       const res = await fetch(`http://localhost:3000/users`, {
         method: "POST",
         mode: "cors",

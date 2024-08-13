@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "../context/auth";
 
 export default function OrderList() {
   const { id } = useParams();
@@ -11,28 +12,42 @@ export default function OrderList() {
   const [itemName, setItemName] = useState("");
   const [status, setStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
 
 
   //ordersのデータを取得
   useEffect(() => {
     async function fetchOrderData() {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch("http://localhost:3000/orders", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       const data = await res.json();
       console.log("retrieved data from GET /orders", data);
       setOrders(data);
       setIsLoading(false);
     }
-    fetchOrderData();
-  }, []);
+
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchOrderData();
+    }
+
+
+
+  }, [isAuthenticated]);
 
 
   useEffect(() => {
     async function fetchSupplierData() {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch("http://localhost:3000/suppliers", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット''
+        }
       });
       const supplierList = await res.json();
       console.log("retrieved data from GET /suppliers", supplierList);
@@ -44,8 +59,14 @@ export default function OrderList() {
       );
       setIsLoading(false);
     }
-    fetchSupplierData();
-  }, []);
+
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchSupplierData();
+    }
+
+
+
+  }, [isAuthenticated]);
 
   const handleSearch = () => {
     // 検索ロジックを追加します。
@@ -62,9 +83,13 @@ export default function OrderList() {
 
   const handleDelete = (id) => {
     async function deleteData(id) {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch(`http://localhost:3000/orders/${id}`, {
         method: "DELETE",
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
       });
       setOrders(orders.filter((order) => order.id !== id));
     }

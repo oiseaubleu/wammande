@@ -6,22 +6,13 @@ import { useSearchParams } from "next/navigation";
 import { OrderRow } from "../OrderRow";
 import { useAuth } from "../../context/auth";
 
-/***********************************************
- * 仕入先情報を取得
- ************************************************/
-
-function fetchSuppliers() {
-  return fetch("http://localhost:3000/orders/new", { mode: "cors" })
-    .then((response) => response.json())
-    .catch((error) => console.error("Error fetching suppliers:", error));
-}
 
 /***********************************************
  * 仕入先名のドロップダウンメニュー
  ************************************************/
 
 export function SupplierNameDropdown({ suppliers, searchTerm, onSelect, parentRef }) {
-  const filteredSuppliers = suppliers.filter((supplier) =>
+  const filteredSuppliers = suppliers?.filter((supplier) =>
     supplier.name.includes(searchTerm)
   );
 
@@ -53,7 +44,7 @@ export function SupplierNameDropdown({ suppliers, searchTerm, onSelect, parentRe
 export function SupplierName({ suppliers, inputRef, supplierSelected, initialSearchTerm }) {
   const [searchTerm, setSearchTerm] = useState(""); //検索ワード
   const [showDropdown, setShowDropdown] = useState(false); //ドロップダウンメニューの表示状態
-
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
 
   // ドロップダウンメニューの外側をクリックしたら閉じる
   const dropdownRef = useRef();
@@ -148,12 +139,21 @@ export default function OrderRegistration() {
 
   useEffect(() => {
     async function fetchData() {
-      const suppliersData = await fetchSuppliers();
-      setSuppliers(suppliersData);
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
+      const res = await fetch("http://localhost:3000/orders/new", {
+        mode: "cors", headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
+      })
+      const data = await res.json();
+      console.log("retrieved data from GET /orders/new", data);
+      setSuppliers(data);
+    }
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData();
     }
 
-    fetchData();
-  }, []);
+  }, [isAuthenticated]);
 
   const handleAddRow = () => {
     setOrderDetails([
@@ -164,6 +164,7 @@ export default function OrderRegistration() {
         order_status: 0,
         quantity: 0,
         subtotal_amount: 0,
+
       },
     ]);
   };
@@ -252,6 +253,7 @@ export default function OrderRegistration() {
               inputRef={inputRef}
               supplierSelected={supplierSelected}
               initialSearchTerm={supplierName}
+              getAccessToken={getAccessToken}
             />
           </div>
           <div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from "next/link";
+import { useAuth } from "./context/auth";
 // ToDoList Component
 function ToDoList({ todos }) {
   return (
@@ -81,19 +82,26 @@ function PendingList({ pendings, onEdit }) {
 export default function Page() {
   const [notOrdered, setNotOrdered] = useState([]);
   const [orderedPendingDelivery, setOrderedPendingDelivery] = useState([]);
-
+  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
   useEffect(() => {
     async function fetchData() {
+      const accessToken = await getAccessToken(); //1. アクセストークンを取得
       const res = await fetch("http://localhost:3000/orders/todo", {
         mode: "cors",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+        }
+
       });
       const data = await res.json();
       console.log("retrieved data from GET /orders/todo", data);
       setNotOrdered(makeNotOrderedData(data.not_ordered));
       setOrderedPendingDelivery(data.ordered_pending_delivery);
     }
-    fetchData();
-  }, []);
+    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   // 重複を削除する（未発注分のみ。）
   function filterNotOrdered(data) {
