@@ -11,12 +11,21 @@ class OrderRecord < ApplicationRecord
   validates :total_amount, presence: true
 
   scope :search_order, lambda { |search_params|
-                         search_by_supplier_name(search_params[:supplier_name])
-                           .search_by_purchase_name(search_params[:purchase_name])
-                           .search_by_order_date(search_params[:order_date])
-                           .search_by_order_status(search_params[:status])
+                         query = all
+                         if search_params[:supplier_name].present?
+                           query = query.search_by_supplier_name(search_params[:supplier_name])
+                         end
+                         if search_params[:purchase_name].present?
+                           query = query.search_by_purchase_name(search_params[:purchase_name])
+                         end
+                         if search_params[:order_date].present?
+                           query = query.search_by_order_date(search_params[:order_date])
+                         end
+                         if search_params[:status].present? && search_params[:status].match?(/\A\d+\z/)
+                           query = query.search_by_order_status(search_params[:status])
+                         end
+                         query
                        }
-
   # 仕入先名でのあいまい検索
   scope :search_by_supplier_name, lambda { |supplier_name|
                                     if supplier_name.present?
@@ -30,13 +39,18 @@ class OrderRecord < ApplicationRecord
   }
 
   # 発注日での検索
-  scope :search_by_order_date, lambda { |order_date|
-    where(order_date:)
-  }
+  scope :search_by_order_date, lambda { |date|
+                                 begin
+                                   where(order_date: date) if Date.parse(date)
+                                 rescue StandardError
+                                   nil
+                                 end
+                               }
+
   # 発注状態での検索
   scope :search_by_order_status, lambda { |status|
-    where(order_status: status)
-  }
+                                   where(order_status: status.to_i) if status.present? && status.match?(/\A\d+\z/)
+                                 }
 
   # enum
   enum order_status: {
