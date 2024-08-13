@@ -51,8 +51,8 @@ export default function RemainingBudget() {
     <div className="flex flex-col items-end">
       {budgetStatusMessage()}
       <div className="flex flex-row justify-end w-full">
-        <h2 className="text-2xl m-5 font-light">Remaining Budget</h2>
-        <p className="text-2xl m-5 font-bold"> € {remainingBudget} EUR</p>
+        <h2 className="text-2xl m-5 font-light">予算残額</h2>
+        <p className="text-2xl m-5 font-bold"> € {remainingBudget} </p>
         {/* <Link href={"/budgets"}>
           <button className="p-2 m-5 rounded bg-slate-300 hover:bg-sky-300">
             Edit Budget

@@ -7,9 +7,9 @@ function LoginForm() {
 
   return (
     <div>
-      { isAuthenticated ? (
+      {isAuthenticated ? (
         <div>
-          <h1 className="py-4">こんちは、 {user.name}</h1>
+          <h1 className="py-4">Bonjour!! {user.name}!</h1>
           <button
             className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
             onClick={logout}
@@ -20,14 +20,14 @@ function LoginForm() {
       ) : (
         <div>
           <h1>ログインしてください</h1>
-          <button 
+          <button
             className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
             onClick={login}
           >
             ログイン
           </button>
         </div>
-      ) }
+      )}
     </div>
   );
 }

@@ -4,11 +4,11 @@ import LoginForm from "./LoginForm";
 export default function NavBar() {
   const navBarItems = [
     { name: "Home", link: "/" },
-    { name: "Budgets", link: "/budgets" },
-    { name: "Purchases", link: "/purchases" },
-    { name: "Suppliers", link: "/suppliers" },
-    { name: "Orders", link: "/orders" },
-    { name: "Users", link: "/users" },
+    { name: "予算管理", link: "/budgets" },
+    { name: "仕入品マスタ", link: "/purchases" },
+    { name: "仕入先マスタ", link: "/suppliers" },
+    { name: "発注管理", link: "/orders" },
+    { name: "ユーザ管理", link: "/users" },
   ];
 
   return (

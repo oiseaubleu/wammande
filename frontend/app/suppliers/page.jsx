@@ -86,7 +86,7 @@ export default function Page() {
           {suppliers.map((supplier) => (
             <tr key={supplier.id} className="border-b">
               <td className="px-4 py-2">{supplier.name}</td>
-              <td className="px-4 py-2">{supplier.next_purchase_day}</td>
+              <td className="px-4 py-2">{supplier.next_purchase_day.split("T")[0]}</td>
               <td className="px-4 py-2 flex space-x-2">
                 {/* <button
                   onClick={() => handleEdit(supplier.id)}
