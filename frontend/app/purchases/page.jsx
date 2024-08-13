@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
+
 // 既存の仕入品を編集するためのコンポーネント
 function PurchaseRow({ purchase, onSave, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -96,7 +97,7 @@ function NewPurchaseForm({ onSave, onCancel }) {
   const [isIngredient, setIsIngredient] = useState(true);
 
   const handleSave = () => {
-    onSave({ name: newName, isIngredient });
+    onSave({ name: newName, is_food: isIngredient });
   };
 
   return (
@@ -118,9 +119,7 @@ function NewPurchaseForm({ onSave, onCancel }) {
           onChange={(e) => setIsIngredient(e.target.checked)}
           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
         />
-        <label htmlFor="new-checkbox" className="ml-2">
-
-        </label>
+        <label htmlFor="new-checkbox" className="ml-2"></label>
       </td>
       <td>
         <button
@@ -143,32 +142,36 @@ function NewPurchaseForm({ onSave, onCancel }) {
 // 仕入品一覧ページのコンポーネント
 export default function Page() {
   const [purchases, setPurchases] = useState([]);
-  // 配列の中身はこんな感じ
-  // {id: 1, name: '仕入品sample', is_food: true, created_at: '2024-07-24T08:17:34.642Z', updated_at: '2024-07-24T08:17:34.642Z'}
+  const [searchTerm, setSearchTerm] = useState(""); // ここで検索ボックスの入力値を管理
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
+  const { isAuthenticated, getAccessToken } = useAuth();
 
-  // ページが読み込まれたときに、APIからデータを取ってくる
-  //最初に取ってくるだけでいい（追加の時は再レンダリング不要なので）ので空配列渡す
+  // データの取得
+  async function fetchData(searchName = "") {
+    const accessToken = await getAccessToken();
+    const res = await fetch(`http://localhost:3000/purchases?name=${searchName}`, {
+      mode: "cors",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await res.json();
+    setPurchases(data);
+    setIsLoading(false);
+  }
+
+  // ページ読み込み時にデータを取得
   useEffect(() => {
-    async function fetchData() {
-      const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/purchases", {
-        mode: "cors", //ただのGETなのでmethod不要
-        headers: {
-          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
-        }
-      });
-      const data = await res.json();
-      console.log("retrieved data from GET /purchases", data);
-      setPurchases(data);
-      setIsLoading(false);
-    }
-    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+    if (isAuthenticated) {
       fetchData();
     }
   }, [isAuthenticated]);
+
+  // 検索ボタンがクリックされたときに実行する関数
+  const handleSearch = () => {
+    fetchData(searchTerm);
+  };
 
   const handleAddNew = () => {
     setIsAdding(true);
@@ -176,18 +179,17 @@ export default function Page() {
 
   const handleSaveNewPurchase = (newPurchase) => {
     async function registerData() {
-      const accessToken = await getAccessToken()
+      const accessToken = await getAccessToken();
       const res = await fetch("http://localhost:3000/purchases", {
         method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(newPurchase),
       });
       const data = await res.json();
-      console.log("retrieved data from POST /purchases", data);
       setPurchases([...purchases, data]);
       setIsAdding(false);
     }
@@ -200,15 +202,13 @@ export default function Page() {
 
   const handleSave = (id, updatedPurchase) => {
     async function updateData() {
-      const accessToken = await getAccessToken()
-      // TODO: 更新失敗した場合は、再読み込みするまでデータがずれた状態となる
-      // 本当は成功するまで「更新中...」みたいな表示を出すべき
+      const accessToken = await getAccessToken();
       const res = await fetch(`http://localhost:3000/purchases/${id}`, {
         method: "PUT",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(updatedPurchase),
       });
@@ -217,7 +217,6 @@ export default function Page() {
         setPurchases(purchases);
       } else {
         const data = await res.json();
-        console.log("retrieved data from PUT /purchases", data);
         setPurchases(
           purchases.map((purchase) =>
             purchase.id === data.id ? data : purchase
@@ -230,19 +229,18 @@ export default function Page() {
 
   const handleDelete = (id) => {
     async function deleteData() {
-      const accessToken = await getAccessToken()
+      const accessToken = await getAccessToken();
       const purchasesBeforeDelete = [...purchases];
       const res = await fetch(`http://localhost:3000/purchases/${id}`, {
         method: "DELETE",
         mode: "cors",
         headers: {
-          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
-        }
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
       if (res.status >= 400) {
         setPurchases(purchasesBeforeDelete);
         alert("削除に失敗しました。");
-        // TODO: エラー表示を出す。Next.jsの何かがあったはず…
       } else {
         setPurchases(purchases.filter((purchase) => purchase.id !== id));
       }
@@ -259,9 +257,14 @@ export default function Page() {
         <div className="flex items-center space-x-4 mb-4">
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)} // 入力値を更新
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           />
-          <button className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+          <button
+            onClick={handleSearch}
+            className="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+          >
             検索
           </button>
           <button
@@ -281,7 +284,7 @@ export default function Page() {
             <thead>
               <tr className="bg-gray-200">
                 <th className="px-4 py-2">仕入品名</th>
-                <th className="px-4 py-2">食材check</th>
+                <th className="px-4 py-2">食材チェック</th>
               </tr>
             </thead>
             <tbody>
@@ -299,7 +302,6 @@ export default function Page() {
                   onDelete={handleDelete}
                 />
               ))}
-
             </tbody>
           </table>
         )}
