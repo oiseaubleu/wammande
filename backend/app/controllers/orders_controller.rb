@@ -10,6 +10,7 @@ class OrdersController < ApplicationController
     supplier_id = params[:supplier_id].present? ? params[:supplier_id].to_i : nil
 
     @orders = if params[:supplier_name].present? || params[:purchase_name].present? || params[:order_date].present? || params[:status].present?
+                # binding.irb
                 OrderRecord.search_order(params)
               else
                 OrderRecord.all

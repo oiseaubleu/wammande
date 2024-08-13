@@ -21,9 +21,7 @@ class OrderRecord < ApplicationRecord
                          if search_params[:order_date].present?
                            query = query.search_by_order_date(search_params[:order_date])
                          end
-                         if search_params[:status].present? && search_params[:status].match?(/\A\d+\z/)
-                           query = query.search_by_order_status(search_params[:status])
-                         end
+                         query = query.search_by_order_status(search_params[:status]) if search_params[:status].present?
                          query
                        }
   # 仕入先名でのあいまい検索
@@ -49,7 +47,7 @@ class OrderRecord < ApplicationRecord
 
   # 発注状態での検索
   scope :search_by_order_status, lambda { |status|
-                                   where(order_status: status.to_i) if status.present? && status.match?(/\A\d+\z/)
+                                   where(order_status: status.to_i)
                                  }
 
   # enum
