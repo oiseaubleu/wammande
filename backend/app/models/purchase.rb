@@ -5,4 +5,7 @@ class Purchase < ApplicationRecord
   # presence validation
   validates :name, presence: true
   validates :is_food, inclusion: { in: [true, false] }
+
+  # 仕入れ品名のあいまい検索
+  scope :purchase_search, ->(name) { where('name like ?', "%#{name}%") if name.present? }
 end

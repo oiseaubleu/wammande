@@ -8,44 +8,49 @@ class PurchasesController < ApplicationController
 
   # 仕入品一覧の表示
   def index
-    @purchases = Purchase.all
+    @purchases = if params[:name]
+                   Purchase.purchase_search(params[:name])
+                 else
+                   Purchase.all
+                 end
+
     render json: @purchases
   end
+end
 
-  # 仕入品の新規登録
-  def create
-    @purchase = Purchase.new(purchase_params)
+# 仕入品の新規登録
+def create
+  @purchase = Purchase.new(purchase_params)
 
-    if @purchase.save
-      render json: @purchase, status: :created # 201
-    else
-      render json: @purchase.errors, status: :unprocessable_entity # 422
-    end
+  if @purchase.save
+    render json: @purchase, status: :created # 201
+  else
+    render json: @purchase.errors, status: :unprocessable_entity # 422
   end
+end
 
-  # 仕入品情報更新
-  def update
-    if @purchase.update(purchase_params)
-      render json: @purchase
-    else
-      render json: @purchase.errors, status: :unprocessable_entity
-    end
+# 仕入品情報更新
+def update
+  if @purchase.update(purchase_params)
+    render json: @purchase
+  else
+    render json: @purchase.errors, status: :unprocessable_entity
   end
+end
 
-  # 仕入品削除
-  def destroy
-    @purchase.destroy
-    head :ok
-  end
+# 仕入品削除
+def destroy
+  @purchase.destroy
+  head :ok
+end
 
   ############################
   private
 
-  def set_purchase
-    @purchase = Purchase.find(params[:id])
-  end
+def set_purchase
+  @purchase = Purchase.find(params[:id])
+end
 
-  def purchase_params
-    params.require(:purchase).permit(:name, :item_number, :is_food)
-  end
+def purchase_params
+  params.require(:purchase).permit(:name, :item_number, :is_food)
 end
