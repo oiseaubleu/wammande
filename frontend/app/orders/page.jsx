@@ -68,9 +68,27 @@ export default function OrderList() {
 
   }, [isAuthenticated]);
 
-  const handleSearch = () => {
-    // 検索ロジックを追加します。
-    console.log("Search clicked [not implemented]");
+  const handleSearch = async () => {
+    const accessToken = await getAccessToken();
+
+    const query = new URLSearchParams({
+      supplier_name: document.querySelector('input[name="supplier_name"]').value,
+      purchase_name: itemName,
+      status: status,
+      order_date: document.querySelector('input[name="order_date"]').value
+    }).toString();
+
+    console.log("Query params:", query);  // クエリパラメータを確認
+    const res = await fetch(`http://localhost:3000/orders?${query}`, {
+      mode: "cors",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      }
+    });
+
+    const data = await res.json();
+    console.log("Search results:", data);  // 取得したデータを確認
+    setOrders(data);
   };
 
   const handleSortByDate = () => {
@@ -135,8 +153,8 @@ export default function OrderList() {
             <label className="block text-sm font-medium">仕入先名</label>
             <input
               type="text"
+              name="supplier_name"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-            // value={supplierName}
             />
           </div>
           <div>
@@ -145,7 +163,7 @@ export default function OrderList() {
               type="text"
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               value={itemName}
-            // onChange={(e) => setItemName(e.target.value)}
+              onChange={(e) => setItemName(e.target.value)}
             />
           </div>
           <div>
@@ -153,12 +171,23 @@ export default function OrderList() {
             <select
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               value={status}
-            // onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => setStatus(e.target.value)}
             >
               <option value="">全て</option>
-              <option value="納品待ち">納品待ち</option>
-              <option value="納品済み">納品済み</option>
+              <option value="not_ordered">未発注</option>
+              <option value="ordered_pending_delivery">納品待ち</option>
+              <option value="delivered">納品済み</option>
+              <option value="order_cancelled">発注キャンセル</option>
+              <option value="delivery_cancelled">納品キャンセル</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium">発注登録日</label>
+            <input
+              type="date"
+              name="order_date"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            />
           </div>
         </div>
         <button
@@ -167,6 +196,7 @@ export default function OrderList() {
         >
           検索
         </button>
+
       </div>
 
       <div className="mb-4">
