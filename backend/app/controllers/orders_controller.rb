@@ -6,7 +6,15 @@ class OrdersController < ApplicationController
 
   # 仕入先一覧の表示
   def index
-    @orders = OrderRecord.all
+    # パラメータが空文字でないことを確認し、整数に変換する（空文字の場合はnilを返す）
+    supplier_id = params[:supplier_id].present? ? params[:supplier_id].to_i : nil
+
+    @orders = if params[:supplier_name].present? || params[:purchase_name].present? || params[:order_date].present? || params[:status].present?
+                OrderRecord.search_order(params)
+              else
+                OrderRecord.all
+              end
+
     render json: @orders
   end
 
@@ -106,24 +114,24 @@ class OrdersController < ApplicationController
 
     render json: { not_ordered:, ordered_pending_delivery: }
   end
-
+end
   ############################
+
   private
 
-  def set_order
-    @order = OrderRecord.find(params[:id])
-  end
+def set_order
+  @order = OrderRecord.find(params[:id])
+end
 
-  def order_params
-    params.require(:order).permit(
-      :supplier_id, :order_status, :order_date, :delivery_date, :total_amount,
-      order_details_attributes: %i[id supplier_purchase_id quantity comment subtotal_amount order_status _destroy]
-    )
-  end
+def order_params
+  params.require(:order).permit(
+    :supplier_id, :order_status, :order_date, :delivery_date, :total_amount,
+    order_details_attributes: %i[id supplier_purchase_id quantity comment subtotal_amount order_status _destroy]
+  )
+end
 
-  def update_next_purchase_day
-    # TODO: 発注がイレギュラーな日付だった場合に、次回発注予定日もくるってしまう
-    # 本当は、定期的な発注と、イレギュラーな発注を区別して次回発注予定日を更新したい
-    @order.supplier.update(next_purchase_day: @order.order_date + @order.supplier.purchase_interval)
-  end
+def update_next_purchase_day
+  # TODO: 発注がイレギュラーな日付だった場合に、次回発注予定日もくるってしまう
+  # 本当は、定期的な発注と、イレギュラーな発注を区別して次回発注予定日を更新したい
+  @order.supplier.update(next_purchase_day: @order.order_date + @order.supplier.purchase_interval)
 end
