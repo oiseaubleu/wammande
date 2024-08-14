@@ -12,7 +12,16 @@ RSpec.describe User, type: :model do
 
     it { is_expected.to validate_presence_of(:email) }
     it { is_expected.to validate_length_of(:email).is_at_most(255) }
-    it { is_expected.to validate_uniqueness_of(:email).case_insensitive.with_message('メールアドレスはすでに使用されています') }
+
+    # ここでnameフィールドに値を設定
+    it 'validates uniqueness of email' do
+      create(:user, name: 'Test User', email: 'test@example.com') # 既存のユーザーを作成
+      new_user = User.new(name: 'New User', email: 'TEST@example.com') # 新しいユーザーを作成
+
+      expect(new_user).not_to be_valid # ユニーク制約に引っかかるはず
+      expect(new_user.errors[:email]).to include('メールアドレスはすでに使用されています')
+    end
+
     it { is_expected.to allow_value('user@example.com').for(:email) }
     it { is_expected.not_to allow_value('userexample.com').for(:email) }
 
