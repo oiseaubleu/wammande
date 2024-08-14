@@ -1,7 +1,7 @@
 class OrderRecord < ApplicationRecord
   belongs_to :supplier
   belongs_to :user
-  has_many :order_details
+  has_many :order_details, dependent: :destroy
 
   accepts_nested_attributes_for :order_details, allow_destroy: true
 
@@ -38,12 +38,15 @@ class OrderRecord < ApplicationRecord
 
   # 発注日での検索
   scope :search_by_order_date, lambda { |date|
-                                 begin
-                                   where(order_date: date) if Date.parse(date)
-                                 rescue StandardError
-                                   nil
-                                 end
+                                 where(order_date: date) if date.present? && date.match(/\A\d{4}-\d{2}-\d{2}\z/)
                                }
+  # scope :search_by_order_date, lambda { |date|
+  #                                begin
+  #                                  where(order_date: date) if Date.parse(date)
+  #                                rescue StandardError
+  #                                  nil
+  #                                end
+  #                              }
 
   # 発注状態での検索
   scope :search_by_order_status, lambda { |status|

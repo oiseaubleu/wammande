@@ -33,7 +33,7 @@ class OrdersController < ApplicationController
     end
   end
 
-  # 仕入先一覧の表示()
+  # 仕入先一覧の表示
   def new
     render json: Supplier.all.map { |supplier|
       {
