@@ -62,7 +62,7 @@ class BudgetsController < ApplicationController
       alert_threshold = 0
     end
 
-    display_message = if remaining_budget <= 0
+    display_message = if remaining_budget < 0
                         'over budget'
                       elsif remaining_budget <= alert_threshold
                         'warning'
