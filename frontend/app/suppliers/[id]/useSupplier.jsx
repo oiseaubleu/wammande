@@ -9,6 +9,8 @@ import { useAuth } from "../../context/auth";
  * - 仕入先仕入れ品（SupplierPurchase）の特定のフィールドを更新する
  * - 仕入先仕入れ品を追加する
  */
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 const useSupplier = (id) => {
   const [supplier, setSupplier] = useState({
     id: "",
@@ -27,7 +29,7 @@ const useSupplier = (id) => {
   useEffect(() => {
     async function fetchData(id) {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const purchasesResponse = await fetch(`http://localhost:3000/purchases`, {
+      const purchasesResponse = await fetch(`${API_DOMAIN}/purchases`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -45,7 +47,7 @@ const useSupplier = (id) => {
       if (id !== "new") {
 
         const supplierResponse = await fetch(
-          `http://localhost:3000/suppliers/${id}`,
+          `${API_DOMAIN}/suppliers/${id}`,
           {
             mode: "cors",
             headers: {
@@ -147,7 +149,7 @@ const useSupplier = (id) => {
     async function updateData(requestBody) {
       const accessToken = await getAccessToken()
       if (id === "new") {
-        const res = await fetch(`http://localhost:3000/suppliers`, {
+        const res = await fetch(`${API_DOMAIN}/suppliers`, {
           method: "POST",
           mode: "cors",
           headers: {
@@ -166,7 +168,7 @@ const useSupplier = (id) => {
           window.location.href = `/suppliers/${data.id}`;
         }
       } else {
-        const res = await fetch(`http://localhost:3000/suppliers/${id}`, {
+        const res = await fetch(`${API_DOMAIN}/suppliers/${id}`, {
           method: "PUT",
           mode: "cors",
           headers: {

@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../context/auth";
 
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 export default function OrderList() {
   const { id } = useParams();
   const [orders, setOrders] = useState([]);
@@ -14,12 +16,11 @@ export default function OrderList() {
   const [isLoading, setIsLoading] = useState(true);
   const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
 
-
   //ordersのデータを取得
   useEffect(() => {
     async function fetchOrderData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/orders", {
+      const res = await fetch(`${API_DOMAIN}/orders`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -34,16 +35,12 @@ export default function OrderList() {
     if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
       fetchOrderData();
     }
-
-
-
   }, [isAuthenticated]);
-
 
   useEffect(() => {
     async function fetchSupplierData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/suppliers", {
+      const res = await fetch(`${API_DOMAIN}/suppliers`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット''
@@ -79,7 +76,7 @@ export default function OrderList() {
     }).toString();
 
     console.log("Query params:", query);  // クエリパラメータを確認
-    const res = await fetch(`http://localhost:3000/orders?${query}`, {
+    const res = await fetch(`${API_DOMAIN}/orders?${query}`, {
       mode: "cors",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -102,7 +99,7 @@ export default function OrderList() {
   const handleDelete = (id) => {
     async function deleteData(id) {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch(`http://localhost:3000/orders/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/orders/${id}`, {
         method: "DELETE",
         mode: "cors",
         headers: {

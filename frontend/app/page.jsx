@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from "next/link";
 import { useAuth } from "./context/auth";
+
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 // ToDoList Component
 function ToDoList({ todos }) {
   return (
@@ -86,7 +89,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/orders/todo", {
+      const res = await fetch(`${API_DOMAIN}/orders/todo`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット

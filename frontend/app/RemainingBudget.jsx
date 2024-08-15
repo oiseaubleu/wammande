@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from "./context/auth";
+
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
 export default function RemainingBudget() {
   //今月の予算残高と、予算状態メッセージを受け取る
@@ -13,7 +14,7 @@ export default function RemainingBudget() {
   useEffect(() => {
     async function fetchGetRemainingInfo() {
       const accessToken = await getAccessToken();
-      const res = await fetch("http://localhost:3000/budgets/remaining", {
+      const res = await fetch(`${API_DOMAIN}/budgets/remaining`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -62,5 +63,4 @@ export default function RemainingBudget() {
     </div>
   );
 }
-
 

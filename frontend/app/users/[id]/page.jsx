@@ -5,6 +5,9 @@ import { useParams, useSearchParams } from "next/navigation";
 
 import Link from "next/link";
 import { useAuth } from "../../context/auth";
+
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 export default function Page() {
   const [user, setUser] = useState({
     name: "",
@@ -22,7 +25,7 @@ export default function Page() {
         setIsNew(true);
         return;
       } else {
-        const res = await fetch(`http://localhost:3000/users/${id}`, {
+        const res = await fetch(`${API_DOMAIN}/users/${id}`, {
           mode: "cors",
           headers: {
             Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -54,7 +57,7 @@ export default function Page() {
     const accessToken = await getAccessToken();
     if (isNew) {
 
-      const res = await fetch(`http://localhost:3000/users`, {
+      const res = await fetch(`${API_DOMAIN}/users`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -67,7 +70,7 @@ export default function Page() {
       console.log("returned data from POST /users", data);
       window.location.href = `/users/${data.id}`;
     } else {
-      const res = await fetch(`http://localhost:3000/users/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/users/${id}`, {
         method: "PUT",
         mode: "cors",
         headers: {

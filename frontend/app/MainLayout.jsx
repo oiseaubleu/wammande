@@ -21,7 +21,7 @@ export default function MainLayout({ children }) {
             <header className="justify-between items-center bg-">
               <div>
                 <Link href="/">
-                  <h1 className="text-4xl font-extralight cursor-pointer">Wa'Mmande</h1>
+                  <h1 className="text-4xl font-extralight cursor-pointer">Wa&rsquo;Mmande</h1>
                 </Link>
               </div>
               <div>{<RemainingBudget />}</div>

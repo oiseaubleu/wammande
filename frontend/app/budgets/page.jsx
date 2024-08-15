@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 // 既存の予算を編集するためのコンポーネント
 function BudgetRow({ budget, onSave, onDelete, remainingBudget }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -260,11 +262,6 @@ function getBudgetInfo(year, month, data) {
   }
 }
 
-
-
-
-
-
 // 予算一覧ページのコンポーネント
 export default function BudgetList() {
   const [budgets, setBudgets] = useState([]);
@@ -276,7 +273,7 @@ export default function BudgetList() {
   useEffect(() => {
     async function fetchBudgetData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/budgets", {
+      const res = await fetch(`${API_DOMAIN}/budgets`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -296,7 +293,7 @@ export default function BudgetList() {
   useEffect(() => {
     async function fetchReminingData() {
       const accessToken = await getAccessToken();
-      const res = await fetch("http://localhost:3000/budgets/remaining", {
+      const res = await fetch(`${API_DOMAIN}/budgets/remaining`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -323,7 +320,7 @@ export default function BudgetList() {
   const handleSaveNewBudgets = (newBudget) => {
     async function registerData() {
       const accessToken = await getAccessToken();
-      const res = await fetch("http://localhost:3000/budgets", {
+      const res = await fetch(`${API_DOMAIN}/budgets`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -343,7 +340,7 @@ export default function BudgetList() {
   const handleSave = (id, updatedBudget) => {
     async function updateData() {
       const accessToken = await getAccessToken();
-      const res = await fetch(`http://localhost:3000/budgets/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/budgets/${id}`, {
         method: "PUT",
         mode: "cors",
         headers: {
@@ -374,7 +371,7 @@ export default function BudgetList() {
     async function deleteData() {
       const budgetBeforeDelete = [...budgets];
       const accessToken = await getAccessToken();
-      const res = await fetch(`http://localhost:3000/budgets/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/budgets/${id}`, {
         method: "DELETE",
         mode: "cors",
         headers: {

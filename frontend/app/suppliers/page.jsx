@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/auth";
+
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 // 仕入先一覧ページのコンポーネント
 export default function Page() {
   const [suppliers, setSuppliers] = useState([]);
@@ -12,7 +15,7 @@ export default function Page() {
   useEffect(() => {
     async function fetchData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/suppliers", {
+      const res = await fetch(`${API_DOMAIN}/suppliers`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -44,7 +47,7 @@ export default function Page() {
   const handleDelete = (id) => {
     async function deleteData(id) {
       const accessToken = await getAccessToken()
-      const res = await fetch(`http://localhost:3000/suppliers/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/suppliers/${id}`, {
         method: "DELETE",
         mode: "cors",
         headers: {

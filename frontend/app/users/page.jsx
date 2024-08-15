@@ -5,6 +5,8 @@ import Link from 'next/link';
 
 import { useAuth } from '../context/auth';
 
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 export default function Page() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,7 +15,7 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch('http://localhost:3000/users', {
+      const res = await fetch(`${API_DOMAIN}/users`, {
         mode: 'cors',
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット

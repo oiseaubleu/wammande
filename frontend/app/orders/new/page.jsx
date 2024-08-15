@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { OrderRow } from "../OrderRow";
 import { useAuth } from "../../context/auth";
 
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
 /***********************************************
  * 仕入先名のドロップダウンメニュー
@@ -140,7 +141,7 @@ export default function OrderRegistration() {
   useEffect(() => {
     async function fetchData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const res = await fetch("http://localhost:3000/orders/new", {
+      const res = await fetch(`${API_DOMAIN}/orders/new`, {
         mode: "cors", headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
         }
@@ -193,7 +194,7 @@ export default function OrderRegistration() {
    */
   const saveOrder = async (order) => {
     const accessToken = await getAccessToken();
-    const res = await fetch("http://localhost:3000/orders", {
+    const res = await fetch(`${API_DOMAIN}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

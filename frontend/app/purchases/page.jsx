@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth";
 
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 // 既存の仕入品を編集するためのコンポーネント
 function PurchaseRow({ purchase, onSave, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -150,7 +152,7 @@ export default function Page() {
   // データの取得
   async function fetchData(searchName = "") {
     const accessToken = await getAccessToken();
-    const res = await fetch(`http://localhost:3000/purchases?name=${searchName}`, {
+    const res = await fetch(`${API_DOMAIN}/purchases?name=${searchName}`, {
       mode: "cors",
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -180,7 +182,7 @@ export default function Page() {
   const handleSaveNewPurchase = (newPurchase) => {
     async function registerData() {
       const accessToken = await getAccessToken();
-      const res = await fetch("http://localhost:3000/purchases", {
+      const res = await fetch(`${API_DOMAIN}/purchases`, {
         method: "POST",
         mode: "cors",
         headers: {
@@ -203,7 +205,7 @@ export default function Page() {
   const handleSave = (id, updatedPurchase) => {
     async function updateData() {
       const accessToken = await getAccessToken();
-      const res = await fetch(`http://localhost:3000/purchases/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/purchases/${id}`, {
         method: "PUT",
         mode: "cors",
         headers: {
@@ -231,7 +233,7 @@ export default function Page() {
     async function deleteData() {
       const accessToken = await getAccessToken();
       const purchasesBeforeDelete = [...purchases];
-      const res = await fetch(`http://localhost:3000/purchases/${id}`, {
+      const res = await fetch(`${API_DOMAIN}/purchases/${id}`, {
         method: "DELETE",
         mode: "cors",
         headers: {

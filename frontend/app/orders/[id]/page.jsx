@@ -6,6 +6,8 @@ import Link from "next/link";
 import { SupplierName, OrderRow } from "../OrderRow";
 import { useAuth } from "../../context/auth";
 
+const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
+
 export default function OrderDetail() {
   const { id } = useParams();
   const [order, setOrder] = useState({});
@@ -32,7 +34,7 @@ export default function OrderDetail() {
      */
     async function fetchOrderData() {
       const accessToken = await getAccessToken(); //1. アクセストークンを取得
-      const orderRes = await fetch(`http://localhost:3000/orders/${id}`, {
+      const orderRes = await fetch(`${API_DOMAIN}/orders/${id}`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -41,7 +43,7 @@ export default function OrderDetail() {
       const order = await orderRes.json();
       console.log("retrieved data from GET /orders/:id", order);
 
-      const supplierPurchasesRes = await fetch(`http://localhost:3000/suppliers/${order.supplier_id}`, {
+      const supplierPurchasesRes = await fetch(`${API_DOMAIN}/suppliers/${order.supplier_id}`, {
         mode: "cors",
         headers: {
           Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
@@ -89,7 +91,7 @@ export default function OrderDetail() {
       })
     };
 
-    const res = await fetch(`http://localhost:3000/orders/${id}`, {
+    const res = await fetch(`${API_DOMAIN}/orders/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
