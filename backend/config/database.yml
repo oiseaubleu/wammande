@@ -20,6 +20,14 @@ default: &default
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  # username: postgres
+  # password: mypassword
+  # host: localhost
+  # port: 5432
+  host: <%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_HOST") %>
+  port: <%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_PORT") %>
+  username: <%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_USERNAME") || "purchase_management" %>
+  password: '<%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_PASSWORD") %>'
 
 development:
   <<: *default
@@ -80,7 +88,11 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   database: purchase_management_production
-  username: purchase_management
-  password: <%= ENV['PURCHASE_MANAGEMENT_DATABASE_PASSWORD'] %>
+  host: <%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_HOST") %>
+  port: <%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_PORT") %>
+  username: <%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_USERNAME") || "purchase_management" %>
+  password: '<%= ENV.fetch("PURCHASE_MANAGEMENT_DATABASE_PASSWORD") %>'
