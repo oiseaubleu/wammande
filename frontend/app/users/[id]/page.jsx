@@ -16,11 +16,12 @@ export default function Page() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isNew, setIsNew] = useState(false);
-  const { isAuthenticated, getAccessToken } = useAuth();//0. useAuthフックを使って認証情報を取得
+  const { isAuthenticated, getAccessToken } = useAuth();
   const { id } = useParams();
+
   useEffect(() => {
     const fetchData = async (id) => {
-      const accessToken = await getAccessToken(); //1. アクセストークンを取得
+      const accessToken = await getAccessToken();
       if (id === "new") {
         setIsNew(true);
         return;
@@ -28,7 +29,7 @@ export default function Page() {
         const res = await fetch(`${API_DOMAIN}/users/${id}`, {
           mode: "cors",
           headers: {
-            Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+            Authorization: `Bearer ${accessToken}`,
           }
         });
         const data = await res.json();
@@ -36,12 +37,9 @@ export default function Page() {
       }
     };
 
-    if (isAuthenticated) { //3. 認証情報が取得できたらデータを取得
+    if (isAuthenticated) {
       fetchData(id);
     }
-
-
-
   }, [id, isAuthenticated]);
 
   const { mode } = useSearchParams();
@@ -56,13 +54,12 @@ export default function Page() {
   const saveUser = async () => {
     const accessToken = await getAccessToken();
     if (isNew) {
-
       const res = await fetch(`${API_DOMAIN}/users`, {
         method: "POST",
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(user),
       });
@@ -75,7 +72,7 @@ export default function Page() {
         mode: "cors",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,//2. アクセストークンをヘッダーにセット
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(user),
       });
@@ -114,10 +111,10 @@ export default function Page() {
           <label className="block text-sm font-medium">管理者フラグ</label>
           <input
             type="checkbox"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="mt-1"
             checked={user.admin}
-            onChange={(e) => updateUser("checked", e.target.value)}
-            readOnly={!isEditing}
+            onChange={(e) => updateUser("admin", e.target.checked)}
+            disabled={!isEditing}
           />
         </div>
       </div>
