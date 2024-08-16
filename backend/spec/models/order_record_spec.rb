@@ -27,7 +27,9 @@ RSpec.describe OrderRecord, type: :model do
 
   describe 'scopes' do
     let!(:order_record) do
-      create(:order_record, order_status: 1, order_date: '2021-01-01', supplier:, user:)
+      order_record = create(:order_record, order_status: 1, order_date: '2021-01-01', supplier:, user:)
+      order_record.order_details << create(:order_detail, order_record:)
+      order_record
     end
     let!(:supplier) { create(:supplier, name: 'Test Supplier') }
     let!(:user) { create(:user) }
@@ -38,7 +40,8 @@ RSpec.describe OrderRecord, type: :model do
 
     it 'searches by purchase name' do
       # Assuming purchase name is setup in your factory
-      expect(OrderRecord.search_by_purchase_name('Purchase Name')).to include(order_record)
+      # binding.irb
+      expect(OrderRecord.search_by_purchase_name('Generic')).to include(order_record)
     end
 
     it 'searches by order date' do

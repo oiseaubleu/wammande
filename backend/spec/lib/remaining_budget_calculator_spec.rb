@@ -13,7 +13,7 @@ RSpec.describe RemainingBudgetCalculator, type: :model do
     it 'calculates remaining budget correctly' do
       results = RemainingBudgetCalculator.new.calculate
 
-      expect(results.size).to eq(2)
+      expect(results.length).to eq(2)
       expect(results[0].total_budget.to_f).to eq(1000.0)
       expect(results[0].total_order_amount.to_f).to eq(500.0)
       expect(results[0].remaining_budget.to_f).to eq(500.0)

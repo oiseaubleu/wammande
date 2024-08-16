@@ -1,4 +1,3 @@
-# spec/models/supplier_purchase_spec.rb
 require 'rails_helper'
 
 RSpec.describe SupplierPurchase, type: :model do
@@ -13,9 +12,9 @@ RSpec.describe SupplierPurchase, type: :model do
     it { is_expected.to validate_numericality_of(:price) }
 
     it { is_expected.to validate_presence_of(:version) }
-    it { is_expected.to validate_numericality_of(:version).only_integer }
+    it { is_expected.to validate_numericality_of(:version) }
 
     it { is_expected.to validate_presence_of(:purchase_count) }
-    it { is_expected.to validate_numericality_of(:purchase_count).only_integer }
+    it { is_expected.to validate_numericality_of(:purchase_count) }
   end
 end

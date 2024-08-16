@@ -5,7 +5,6 @@ class SupplierPurchase < ApplicationRecord
 
   # presence validation
   validates :price, presence: true, numericality: true
-  validates :version, presence: true
-  validates :purchase_count, presence: true
- 
+  validates :version, presence: true, numericality: true
+  validates :purchase_count, presence: true, numericality: true
 end

@@ -1,6 +1,6 @@
 class Supplier < ApplicationRecord
   has_many :order_records
-  has_many :supplier_purchases
+  has_many :supplier_purchases, dependent: :destroy
   has_many :purchases, through: :supplier_purchases
 
   accepts_nested_attributes_for :supplier_purchases, allow_destroy: true
