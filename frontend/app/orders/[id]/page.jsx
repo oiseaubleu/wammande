@@ -5,7 +5,15 @@ import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SupplierName, OrderRow } from "../OrderRow";
 import { useAuth } from "../../context/auth";
-
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  PDFDownloadLink,
+  Font
+} from "@react-pdf/renderer";
 const API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN;
 
 export default function OrderDetail() {
@@ -60,6 +68,72 @@ export default function OrderDetail() {
       fetchOrderData();
     }
   }, [id, isAuthenticated]);
+
+
+  // PDFの内容を定義するコンポーネント
+  const MyDocument = () => (
+    <Document>
+      <Page style={styles.body}>
+        <Text style={styles.header}>発注内容詳細</Text>
+        <View style={styles.section}>
+          <Text style={styles.label}>ステータス</Text>
+          <Text style={styles.value}>{getOrderStatusLabel(order.order_status)}</Text>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.title}>発注先情報</Text>
+          <Text style={styles.label}>仕入先名: {order.supplier_name}</Text>
+          <Text style={styles.label}>発注日: {order.order_date?.split("T")[0]}</Text>
+        </View>
+        <View style={styles.section}>
+          <Text style={styles.title}>発注品情報</Text>
+          <View style={styles.table}>
+            <View style={styles.tableRow}>
+              <Text style={styles.tableHeader}>仕入品名</Text>
+              <Text style={styles.tableHeader}>商品番号</Text>
+              <Text style={styles.tableHeader}>数量</Text>
+              <Text style={styles.tableHeader}>単価</Text>
+              <Text style={styles.tableHeader}>小計</Text>
+            </View>
+            {order.order_details?.filter(detail => !detail._destroy).map((detail, index) => (
+              <View key={index} style={styles.tableRow}>
+                <Text style={styles.tableCell}>
+                  {detail.purchase_name || "N/A"}
+                </Text>
+                <Text style={styles.tableCell}>
+                  {purchases.find((p) => p.id === detail.supplier_purchase_id).item_number || "N/A"}
+                </Text>
+                <Text style={styles.tableCell}>
+                  {detail.quantity || 0}
+                </Text>
+                <Text style={styles.tableCell}>
+                  {purchases.find((p) => p.id === detail.supplier_purchase_id).price || 0}
+                </Text>
+                <Text style={styles.tableCell}>
+                  {detail.subtotal_amount || 0}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+        <Text style={styles.total}>合計金額: €{order.total_amount}</Text>
+      </Page>
+    </Document>
+  );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   /**
@@ -327,12 +401,15 @@ export default function OrderDetail() {
         <div className="text-xl">
           合計金額: <span className="font-bold">€{order.total_amount}</span>
         </div>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-          onClick={handlePDFExport}
-        >
-          PDF出力
-        </button>
+        <PDFDownloadLink document={<MyDocument />} fileName="order_details.pdf">
+          {({ blob, url, loading, error }) =>
+            loading ? "PDF作成中..." : (
+              <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+                PDF出力
+              </button>
+            )
+          }
+        </PDFDownloadLink>
       </div>
 
       <div className="flex justify-between mt-8">
@@ -346,3 +423,67 @@ export default function OrderDetail() {
     </div>
   );
 }
+
+Font.register({
+  family: "NotoSansJP",
+  fonts: [
+    {
+      src: "/fonts/NotoSansJP-Regular.ttf",
+    },
+    {
+      src: "/fonts/NotoSansJP-Bold.ttf",
+      fontWeight: "bold",
+    },
+  ],
+});
+
+// PDF用のスタイル
+const styles = StyleSheet.create({
+  body: {
+    padding: 10,
+    fontSize: 12,
+    fontFamily: "NotoSansJP",
+  },
+  header: {
+    fontSize: 18,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  section: {
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  table: {
+    display: "table",
+    width: "100%",
+  },
+  tableRow: {
+    display: "flex",
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E4E4E4",
+    paddingVertical: 5,
+  },
+  tableHeader: {
+    flexGrow: 1,
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  tableCell: {
+    flexGrow: 1,
+    fontSize: 12,
+  },
+  total: {
+    marginTop: 20,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "right",
+  },
+});
