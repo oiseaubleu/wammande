@@ -11,9 +11,9 @@ function ToDoList({ todos }) {
   return (
     <div className="p-4">
       <h2 className="text-lg font-semibold">ToDo</h2>
-      <table className="min-w-full bg-white border">
+      <table className=" min-w-full bg-white border">
         <thead>
-          <tr>
+          <tr className="bg-pink-200">
             <th className="py-2 px-4 border-b">仕入先</th>
             <th className="py-2 px-4 border-b">次回発注予定日</th>
             <th className="py-2 px-4 border-b">前回の発注日</th>
@@ -29,7 +29,7 @@ function ToDoList({ todos }) {
               <td className="py-2 px-4 border-b text-center">
                 <Link href={`/orders/new?supplier_id=${todo.supplier_id}`} >
                   <button
-                    className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-700"
+                    className="bg-pink-500 text-white rounded px-4 py-2 hover:bg-pink-700"
                   >
                     発注登録
                   </button>
@@ -50,7 +50,7 @@ function PendingList({ pendings, onEdit }) {
       <h2 className="text-lg font-semibold">納品待ち</h2>
       <table className="min-w-full bg-white border">
         <thead>
-          <tr>
+          <tr className="bg-sky-200">
             <th className="py-2 px-4 border-b">仕入先</th>
 
             <th className="py-2 px-4 border-b">前回の発注日</th>
@@ -66,7 +66,7 @@ function PendingList({ pendings, onEdit }) {
               <td className="py-2 px-4 border-b text-center">
                 <Link href={`/orders/${pending.order_id}?mode=edit`}>
                   <button
-                    className="bg-gray-500 text-white rounded px-4 py-2 hover:bg-gray-700"
+                    className="bg-sky-500 text-white rounded px-4 py-2 hover:bg-sky-700"
 
                   >
                     編集

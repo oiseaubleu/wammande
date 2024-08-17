@@ -34,13 +34,13 @@ export default function RemainingBudget() {
     if (displayMessage == 'over budget') {
       return (
         <p className="bg-red-200 p-2 rounded mb-2 font-light ">
-          予算超過しています！！！
+          予算超過しています🥵
         </p>
       )
     } else if (displayMessage == 'warning') {
       return (
         <p className="bg-yellow-200 p-2 rounded mb-2 font-light ">
-          もうすぐ予算超過します！！！
+          もうすぐ予算超過します😮
         </p>
       )
     } else {
