@@ -313,7 +313,7 @@ export default function OrderRegistration() {
         <div className="flex space-x-2">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700"
+            className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-gray-700"
           >
             一時保存
           </button>
@@ -324,7 +324,7 @@ export default function OrderRegistration() {
             発注登録
           </button>
           <Link href="/orders">
-            <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700">
+            <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-700">
               戻る
             </button>
           </Link>
